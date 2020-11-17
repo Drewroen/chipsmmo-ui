@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-  "version": 1, 
+  "version": 1,
   "newProjectRoot": "projects",
   "projects": {
     "chipsmmo-ui": {
@@ -26,7 +26,9 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/pixi.js/dist/pixi.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -98,27 +100,15 @@
           "options": {
             "tsConfig": [
               "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
+              "tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
             ]
           }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "chipsmmo-ui:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "chipsmmo-ui:serve:production"
-            }
-          }
         }
       }
-    }},
+    }
+  },
   "defaultProject": "chipsmmo-ui"
 }

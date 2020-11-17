@@ -44,15 +44,11 @@
       }
     ],
     "no-consecutive-blank-lines": false,
-    "no-console": [
-      true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
-    ],
+    "no-console": {
+      "severity": "warning"
+    },
     "no-empty": false,
+    "no-empty-interface": false,
     "no-inferrable-types": [
       true,
       "ignore-params"
@@ -66,6 +62,9 @@
       "as-needed"
     ],
     "object-literal-sort-keys": false,
+    "only-arrow-functions": [
+      false
+    ],
     "ordered-imports": false,
     "quotemark": [
       true,

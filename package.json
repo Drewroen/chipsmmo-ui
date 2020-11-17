@@ -1,15 +1,21 @@
 {
-  "name": "chipsmmo-ui",
-  "version": "0.0.0",
+  "name": "node-js-getting-started",
+  "version": "0.3.0",
+  "description": "A sample Node.js app using Express 4",
+  "engines": {
+    "node": "12.x"
+  },
+  "main": "dist/server/index.js",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "prebuild": "echo 'no prebuild'",
+    "build": "tsc & ng build --prod & cp ./CHIPS_MMO.dat ./dist/CHIPS_MMO.dat",
+    "prestart": "npm run build",
+    "tsc": "tsc -p tsconfig.json",
+    "start": "nodemon dist/server/index.js",
+    "test": "echo 'no tests'",
+    "postinstall": "ng build --output-path dist --prod"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "~9.0.0",
     "@angular/common": "~9.0.0",
@@ -19,7 +25,22 @@
     "@angular/platform-browser": "~9.0.0",
     "@angular/platform-browser-dynamic": "~9.0.0",
     "@angular/router": "~9.0.0",
-    "rxjs": "~6.5.4",
+    "@types/express": "^4.17.7",
+    "@types/socket.io": "^2.1.10",
+    "@types/socket.io-client": "^1.4.33",
+    "aws-sdk": "^2.756.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.15.2",
+    "fs": "0.0.1-security",
+    "gzip-js": "^0.3.2",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^3.0.0-beta.2",
+    "lz-string": "^1.4.4",
+    "moment": "^2.29.0",
+    "ngx-socket-io": "^3.2.0",
+    "pixi.js": "^4.8.2",
+    "rxjs": "^6.5.5",
+    "socket.io": "^1.7.3",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },
@@ -28,10 +49,11 @@
     "@angular/cli": "~9.0.1",
     "@angular/compiler-cli": "~9.0.0",
     "@angular/language-service": "~9.0.0",
-    "@types/node": "^12.11.1",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
+    "@types/node": "^12.12.53",
     "codelyzer": "^5.1.2",
+    "got": "^11.3.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.3.0",
@@ -40,8 +62,18 @@
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.2",
     "protractor": "~5.4.3",
+    "tape": "^4.7.0",
     "ts-node": "~8.3.0",
     "tslint": "~5.18.0",
     "typescript": "~3.7.5"
-  }
+  },
+  "repository": {
+    "type": "git"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "express"
+  ],
+  "license": "MIT"
 }
