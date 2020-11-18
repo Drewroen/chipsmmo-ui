@@ -1,16 +1,14 @@
-import { EloResult } from './../../objects/eloResult';
-import { UserInfo } from './models/userInfo';
+import { EloResult } from './../objects/eloResult';
+import { UserInfo } from '../objects/userInfo';
 import { AuthService } from './services/auth.service';
-import { MobTile } from './../../objects/mobTile';
-import { Player } from './../../objects/player';
-import { GameMap } from 'objects/gameMap';
+import { Player } from './../objects/player';
 import { MovementService } from './services/movement.service';
 import { SocketIOService } from './services/socketio.service';
 import { Component, OnInit, HostListener } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Constants } from './../../constants/constants';
+import { Constants } from '../constants/constants';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Room, GAME_ROOMS } from 'objects/room';
+import { Room, GAME_ROOMS } from './../objects/room';
 
 declare var PIXI:any;
 
@@ -372,7 +370,6 @@ export class AppComponent implements OnInit{
         const data = JSON.parse(dataString);
         if(data.terrain && data.object && data.mobs)
         {
-          const gameMap: GameMap = Object.assign(new GameMap(), data.gameMap);
           this.updateMap(data.terrain, data.object, data.mobs);
         }
         const playerList: Player[] = new Array<Player>();
@@ -654,7 +651,7 @@ export class AppComponent implements OnInit{
     }
   }
 
-  findPlayer(map: MobTile[][]): number[] {
+  findPlayer(map: any[][]): number[] {
     for (let x = 0; x < Constants.MAP_SIZE; x++) {
       for (let y = 0; y < Constants.MAP_SIZE; y++) {
         const tile = map[x][y];
@@ -667,7 +664,7 @@ export class AppComponent implements OnInit{
     return null;
   }
 
-  private tileIsPlayer(tile: MobTile)
+  private tileIsPlayer(tile: any)
   {
     return tile?.value === Constants.MOB_PLAYER_UP ||
            tile?.value === Constants.MOB_PLAYER_DOWN ||
@@ -680,7 +677,7 @@ export class AppComponent implements OnInit{
     this.socketService.sendData(Constants.SOCKET_EVENT_JOIN_ROOM, roomNumber);
   }
 
-  getEloResultsForPlayer(name: string) {
-    return this.eloResults.filter(result => result.id === name)[0];
+  getEloResultsForPlayer(name: string): EloResult {
+    return this.eloResults ? this.eloResults.filter(result => result.id === name)[0] : null;
   }
 }
