@@ -1,4 +1,4 @@
-import { environment } from '../../environments/environment.local';
+import { environment } from '../../environments/environment';
 import { UserInfo } from "../../objects/userInfo";
 import { Token } from "../../objects/token";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
