@@ -40,8 +40,7 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
+              "sourceMap": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -69,9 +68,6 @@
           "configurations": {
             "production": {
               "browserTarget": "chipsmmo-ui:build:production"
-            },
-            "local": {
-              "browserTarget": "chipsmmo-ui:build:local"
             }
           }
         },

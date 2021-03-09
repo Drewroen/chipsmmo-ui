@@ -2,12 +2,12 @@ import { Constants } from './../../constants/constants';
 import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { io, Socket } from 'socket.io-client';
+import * as io from 'socket.io-client';
 import * as lz from 'lz-string'
 
 @Injectable()
 export class SocketIOService {
-  private socket: Socket;
+  private socket: io.Socket;
 
   constructor() {
     this.socket = io(
