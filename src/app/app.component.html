@@ -12,6 +12,8 @@
           <div class="titleText">Hi, Chip!</div>
           <div class="subText">Create an account to pick your own username.</div>
         </div>
+        <div class="errorText"><strong>NOTE: This site is in early development! Account info will NOT stay!</strong></div>
+        <div class="errorText">The good news? Making an account takes about 5 seconds.</div>
         <button (click)="playGame()" class="btn btn-dark">Play</button>
         <button (click)="goToLogin()" *ngIf="loginState !== LoginStates.LoggedIn" class="btn btn-dark">Login/Create</button>
         <button (click)="logout()" *ngIf="loginState == LoginStates.LoggedIn" class="btn btn-dark">Log Out</button>

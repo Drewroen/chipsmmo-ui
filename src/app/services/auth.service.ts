@@ -27,18 +27,16 @@ export class AuthService {
       headers: new HttpHeaders().set(
         "Authorization",
         "Bearer " + localStorage.getItem("access_token")
-      ),
+      )
     });
   }
 
   logout() {
-    const options = {
-      headers: null,
-      body: {
-        token: localStorage.getItem("refresh_token"),
-      },
-    };
-
-    return this.http.delete(environment.socketUrl + "/logout", options);
+    return this.http.delete(environment.socketUrl + "/logout", {
+      headers: new HttpHeaders().set(
+        "Authorization",
+        "Bearer " + localStorage.getItem("access_token")
+      )
+    });
   }
 }
