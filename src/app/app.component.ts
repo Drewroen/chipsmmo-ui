@@ -374,7 +374,6 @@ export class AppComponent implements OnInit{
     this.gameMapSub = this.socketService.getData(Constants.SOCKET_EVENT_UPDATE_GAME_MAP)
       .subscribe((dataString: any) => {
         const data = JSON.parse(dataString);
-        console.log(data);
         if(data.terrain && data.object && data.mobs)
         {
           this.updateMap(data.terrain, data.object, data.mobs, data.gameStatus === Constants.GAME_STATUS_PLAYING ? data.timer : 0);
@@ -425,8 +424,6 @@ export class AppComponent implements OnInit{
   }
 
   updateMap(terrainTiles: any[][], objectTiles: any[][], mobTiles: any[][], time: any): void {
-    console.log(time);
-
     if(this.findPlayer(mobTiles))
       this.lastCoords = this.findPlayer(mobTiles);
 
