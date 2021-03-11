@@ -2,10 +2,6 @@ export class Constants {
     public static readonly MAP_SIZE = 32;
     public static readonly MAP_VIEW_SIZE = 9;
     public static readonly TILE_SIZE = 32;
-    public static readonly GAME_FPS = 60;
-    public static readonly SOCKET_FPS = 60;
-    public static readonly CONSISTENT_UPDATES_PER_SECOND = 3;
-
     public static readonly GAME_LOBBY_MAX_SIZE = 16;
 
     public static readonly INVENTORY_PIXELS = 192;
@@ -83,17 +79,6 @@ export class Constants {
     public static readonly OBJECT_ICE_SKATES = 48;
     public static readonly OBJECT_SUCTION_BOOTS = 49;
 
-    public static readonly SPAWN_PLAYER = 50;
-    public static readonly SPAWN_CHIP = 51;
-    public static readonly SPAWN_RED_KEY = 52;
-    public static readonly SPAWN_BLUE_KEY = 53;
-    public static readonly SPAWN_GREEN_KEY = 54;
-    public static readonly SPAWN_YELLOW_KEY = 55;
-    public static readonly SPAWN_FLIPPERS = 56;
-    public static readonly SPAWN_FIRE_BOOTS = 57;
-    public static readonly SPAWN_SUCTION_BOOTS = 58;
-    public static readonly SPAWN_ICE_SKATES = 59;
-
     public static readonly MOB_PLAYER_UP = 60;
     public static readonly MOB_PLAYER_RIGHT = 61;
     public static readonly MOB_PLAYER_DOWN = 62;
@@ -135,30 +120,13 @@ export class Constants {
     public static readonly MOB_OPPONENT_DOWN_SWIM = 98;
     public static readonly MOB_OPPONENT_LEFT_SWIM = 99;
 
-    public static readonly SPAWN_MINIMUM_TIME = 1200;
-    public static readonly SPAWN_MAXIMUM_TIME = 2400;
-
     public static readonly DIRECTION_UP = 0;
     public static readonly DIRECTION_RIGHT = 1;
     public static readonly DIRECTION_DOWN = 2;
     public static readonly DIRECTION_LEFT = 3;
     public static readonly DIRECTION_RANDOM = 4;
 
-    public static readonly MINIMUM_CHIPS = 10;
-
-    public static readonly MOVEMENT_SPEED = 8;
-
     public static readonly GAME_STATUS_NOT_STARTED = 0;
     public static readonly GAME_STATUS_PLAYING = 1;
     public static readonly GAME_STATUS_FINISHED = 2;
-
-    public static readonly START_AND_FINISH_TIMER = 600;
-
-    public static readonly REQUIRED_CHIPS_TO_WIN = 5;
-
-    public static readonly MOVE_TYPE_PLAYER = 0;
-    public static readonly MOVE_TYPE_AUTOMATIC = 1;
-
-    public static readonly ELO_MAX_RATING_CHANGE = 20;
-    public static readonly ELO_MIN_RATING_CHANGE = 3;
   }

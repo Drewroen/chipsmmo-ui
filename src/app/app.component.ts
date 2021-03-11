@@ -187,6 +187,7 @@ export class AppComponent implements OnInit{
   public mobMap: any[][];
   public inventoryGraphic: any[][];
   public leaderboardGraphic: any[];
+  public timeRemainingGraphic: any;
 
   public playerList: Player[];
 
@@ -299,9 +300,14 @@ export class AppComponent implements OnInit{
     sidePanel.y = 0;
     this.app.stage.addChild(sidePanel);
 
+    this.timeRemainingGraphic = new PIXI.Text('0:00', {font:'20px Arial', fill:0xffff00, fontWeight:'bold'})
+    this.timeRemainingGraphic.x = Constants.MAP_VIEW_SIZE * Constants.TILE_SIZE + 17;
+    this.timeRemainingGraphic.y = 9;
+    this.app.stage.addChild(this.timeRemainingGraphic);
+
     const leaderboardText = new PIXI.Text('LEADERBOARD', {font:'20px Arial', fill:0xffff00, fontWeight:'bold'});
     leaderboardText.x = Constants.MAP_VIEW_SIZE * Constants.TILE_SIZE + 17;
-    leaderboardText.y = 5;
+    leaderboardText.y = 37;
     this.app.stage.addChild(leaderboardText);
 
     this.leaderboardGraphic = new Array<any>();
@@ -310,7 +316,7 @@ export class AppComponent implements OnInit{
     {
       const playerScoreGraphic = new PIXI.Text('', {font:'14px Arial', fill:0xffff00, fontWeight:'normal'});
       playerScoreGraphic.x = Constants.MAP_VIEW_SIZE * Constants.TILE_SIZE + 17;
-      playerScoreGraphic.y = 37 + (i * 24);
+      playerScoreGraphic.y = 69 + (i * 22);
       this.app.stage.addChild(playerScoreGraphic);
       this.leaderboardGraphic.push(playerScoreGraphic);
     }
@@ -368,9 +374,10 @@ export class AppComponent implements OnInit{
     this.gameMapSub = this.socketService.getData(Constants.SOCKET_EVENT_UPDATE_GAME_MAP)
       .subscribe((dataString: any) => {
         const data = JSON.parse(dataString);
+        console.log(data);
         if(data.terrain && data.object && data.mobs)
         {
-          this.updateMap(data.terrain, data.object, data.mobs);
+          this.updateMap(data.terrain, data.object, data.mobs, data.gameStatus === Constants.GAME_STATUS_PLAYING ? data.timer : 0);
         }
         const playerList: Player[] = new Array<Player>();
         for(const tempPlayer of data.players)
@@ -417,7 +424,8 @@ export class AppComponent implements OnInit{
     })
   }
 
-  updateMap(terrainTiles: any[][], objectTiles: any[][], mobTiles: any[][]): void {
+  updateMap(terrainTiles: any[][], objectTiles: any[][], mobTiles: any[][], time: any): void {
+    console.log(time);
 
     if(this.findPlayer(mobTiles))
       this.lastCoords = this.findPlayer(mobTiles);
@@ -539,7 +547,7 @@ export class AppComponent implements OnInit{
             '. ' +
             (this.playerList[currentPlayerPosition].name?.toLocaleUpperCase() || 'Chip') +
             ' - ' +
-            Math.max(0, (Constants.REQUIRED_CHIPS_TO_WIN - this.playerList[currentPlayerPosition].score));
+            this.playerList[currentPlayerPosition].score;
             this.leaderboardGraphic[i].style.fill = 0xffff00;
           }
         }
@@ -550,7 +558,7 @@ export class AppComponent implements OnInit{
           '. ' +
           (this.playerList[i].name?.toLocaleUpperCase() || 'Chip') +
           ' - ' +
-          Math.max(0, (Constants.REQUIRED_CHIPS_TO_WIN - this.playerList[i].score));
+          this.playerList[i].score;
           if (this.playerList[i].id === this.socketService.getSocketId())
           {
             this.leaderboardGraphic[i].style.fill = 0xffff00;
@@ -563,6 +571,7 @@ export class AppComponent implements OnInit{
       else
         this.leaderboardGraphic[i].text = '';
     }
+    this.timeRemainingGraphic.text = Math.floor(time / 60) + ':' + ("0" + (time % 60)).slice(-2);
   }
 
   updatePlayerList(playerList: Player[]): void {
