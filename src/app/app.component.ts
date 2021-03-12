@@ -169,10 +169,6 @@ export class AppComponent implements OnInit{
     return pass === confirmPass ? null : { notSame: true };
   }
 
-  public playing = false;
-
-  public currentPlayer: Player;
-
   private socketService: SocketIOService;
   private movementService: MovementService;
   private authService: AuthService;
@@ -182,24 +178,33 @@ export class AppComponent implements OnInit{
     Constants.MAP_VIEW_SIZE * Constants.TILE_SIZE,
     { backgroundColor: 0x999999 }
   );
-  public terrainMap: any[][];
-  public objectMap: any[][];
-  public mobMap: any[][];
+
+  // Stores up to date information on the terrain/object/mob values on the map
+  public terrainTileInfo: any[][];
+  public objectTileInfo: any[][];
+  public mobTileInfo: any[][];
+
+  // Stored info about the players, the time remaining, and the status of the game
+  public players: Player[] = [];
+  public time: any;
+  public gameStatus: any;
+
+  // All the graphics
+  public terrainGraphic: any[][];
+  public objectGraphic: any[][];
+  public mobGraphic: any[][];
   public inventoryGraphic: any[][];
   public leaderboardGraphic: any[];
   public timeRemainingGraphic: any;
 
-  public playerList: Player[];
+  public container = new PIXI.Container();
 
+  // Subscriptions for various socket messages
   public roomCountSub: Subscription;
   public currentRoomSub: Subscription;
   public gameMapSub: Subscription;
   public multiLoginSub: Subscription;
   public eloSub: Subscription;
-
-  public container = new PIXI.Container();
-
-  public lastCoords: number[];
 
   public rooms: Room[] = GAME_ROOMS;
 
@@ -213,8 +218,6 @@ export class AppComponent implements OnInit{
   public LoginStates = LoginState;
   public EmailStates = EmailState;
   public GameStates = GameState;
-
-  public timeToStartOrFinish: number;
 
   public eloResults: EloResult[];
 
@@ -321,9 +324,9 @@ export class AppComponent implements OnInit{
       this.leaderboardGraphic.push(playerScoreGraphic);
     }
 
-    this.terrainMap = new Array<Array<any>>();
-    this.objectMap = new Array<Array<any>>();
-    this.mobMap = new Array<Array<any>>();
+    this.terrainGraphic = new Array<Array<any>>();
+    this.objectGraphic = new Array<Array<any>>();
+    this.mobGraphic = new Array<Array<any>>();
     this.inventoryGraphic = new Array<Array<any>>();
 
     for (let x = 0; x < Constants.MAP_VIEW_SIZE; x++) {
@@ -350,9 +353,9 @@ export class AppComponent implements OnInit{
         objectRow.push(objectTile);
         mobRow.push(mobTile);
       }
-      this.terrainMap.push(terrainRow);
-      this.objectMap.push(objectRow);
-      this.mobMap.push(mobRow);
+      this.terrainGraphic.push(terrainRow);
+      this.objectGraphic.push(objectRow);
+      this.mobGraphic.push(mobRow);
     }
 
     for(let i = 0; i < 2; i++)
@@ -371,36 +374,58 @@ export class AppComponent implements OnInit{
       this.inventoryGraphic.push(inventoryRow);
     }
 
-    this.gameMapSub = this.socketService.getData(Constants.SOCKET_EVENT_UPDATE_GAME_MAP)
+    this.gameMapSub = this.socketService.getData(Constants.SOCKET_EVENT_UPDATE_GAME_MAP_FULL)
       .subscribe((dataString: any) => {
         const data = JSON.parse(dataString);
-        if(data.terrain && data.object && data.mobs)
+        if (data.mobs)
+          this.mobTileInfo = data.mobs;
+        if (data.terrain)
+          this.terrainTileInfo = data.terrain;
+        if (data.object)
+          this.objectTileInfo = data.object;
+        if (data.players)
+          this.players = (data.players as Player[]).sort((a, b) => (a.score < b.score) ? 1 : -1);;
+        if (data.gameStatus !== undefined)
         {
-          this.updateMap(data.terrain, data.object, data.mobs, data.gameStatus === Constants.GAME_STATUS_PLAYING ? data.timer : 0);
+          this.gameStatus = data.gameStatus;
         }
-        const playerList: Player[] = new Array<Player>();
-        for(const tempPlayer of data.players)
+        if (data.time)
+          this.time = data.time;
+
+        if (this.mobTileInfo && this.terrainTileInfo && this.objectTileInfo && this.players)
         {
-          const player: Player = Object.assign(new Player(null, null), tempPlayer);
-          playerList.push(player);
-          if(player.id === this.socketService.getSocketId())
-            this.currentPlayer = player;
+          this.updateMap();
+          this.updatePlayerInfo();
+          this.updateScoreboard();
+          this.updateGameInfo();
         }
-        this.updatePlayerList(playerList);
-        switch(data.gameStatus) {
-          case (Constants.GAME_STATUS_PLAYING):
-            this.gameState = GameState.Playing;
-            this.eloResults = null;
-            break;
-          case (Constants.GAME_STATUS_NOT_STARTED):
-            this.gameState = GameState.Starting;
-            this.timeToStartOrFinish = data.timer;
-            this.eloResults = null;
-            break;
-          case (Constants.GAME_STATUS_FINISHED):
-            this.gameState = GameState.Finished;
-            this.timeToStartOrFinish = data.timer;
-            break;
+    });
+
+    this.gameMapSub = this.socketService.getData(Constants.SOCKET_EVENT_UPDATE_GAME_MAP_DELTA)
+      .subscribe((dataString: any) => {
+        const data = JSON.parse(dataString);
+
+        if (data.mobs)
+          this.updateMobs(data.mobs);
+        if (data.terrain)
+          this.updateTerrain(data.terrain);
+        if (data.object)
+          this.updateObjects(data.object);
+        if (data.players)
+          this.players = (data.players as Player[]).sort((a, b) => (a.score < b.score) ? 1 : -1);;
+        if (data.gameStatus !== undefined)
+        {
+          this.gameStatus = data.gameStatus;
+        }
+        if (data.time)
+          this.time = data.time;
+
+        if (this.mobTileInfo && this.terrainTileInfo && this.objectTileInfo && this.players)
+        {
+          this.updateMap();
+          this.updatePlayerInfo();
+          this.updateScoreboard();
+          this.updateGameInfo();
         }
     });
 
@@ -423,118 +448,140 @@ export class AppComponent implements OnInit{
     })
   }
 
-  updateMap(terrainTiles: any[][], objectTiles: any[][], mobTiles: any[][], time: any): void {
-    if(this.findPlayer(mobTiles))
-      this.lastCoords = this.findPlayer(mobTiles);
-
-    const playerCoords = this.findPlayer(mobTiles) ||
-                         this.lastCoords ||
+  updateMap(): void {
+    const playerCoords = this.findPlayerCoordinates() ||
                          [Math.floor(Constants.MAP_SIZE / 2), Math.floor(Constants.MAP_SIZE / 2)];
     for (let relativeX = 0; relativeX < Constants.MAP_VIEW_SIZE; relativeX++) {
       for (let relativeY = 0; relativeY < Constants.MAP_VIEW_SIZE; relativeY++) {
         const x = (playerCoords[0] + relativeX - Math.floor((Constants.MAP_VIEW_SIZE / 2)) + Constants.MAP_SIZE) % Constants.MAP_SIZE;
         const y = (playerCoords[1] + relativeY - Math.floor((Constants.MAP_VIEW_SIZE / 2)) + Constants.MAP_SIZE) % Constants.MAP_SIZE;
-        if(mobTiles[x][y])
+        if(this.mobTileInfo[x][y])
         {
-          if(mobTiles[x][y]?.value === Constants.MOB_PLAYER_UP)
+          if(this.mobTileInfo[x][y]?.value === Constants.MOB_PLAYER_UP)
           {
-            mobTiles[x][y]?.id === this.socketService.getSocketId() ?
-              terrainTiles[x][y] === Constants.TERRAIN_WATER ?
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_UP_SWIM) :
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_UP) :
-              terrainTiles[x][y] === Constants.TERRAIN_WATER ?
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_UP_SWIM) :
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_UP)
+            this.mobTileInfo[x][y]?.id === this.socketService.getSocketId() ?
+              this.terrainTileInfo[x][y] === Constants.TERRAIN_WATER ?
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_UP_SWIM) :
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_UP) :
+              this.terrainTileInfo[x][y] === Constants.TERRAIN_WATER ?
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_UP_SWIM) :
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_UP)
           }
-          else if(mobTiles[x][y]?.value === Constants.MOB_PLAYER_DOWN)
+          else if(this.mobTileInfo[x][y]?.value === Constants.MOB_PLAYER_DOWN)
           {
-            mobTiles[x][y]?.id === this.socketService.getSocketId() ?
-              terrainTiles[x][y] === Constants.TERRAIN_WATER ?
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_DOWN_SWIM) :
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_DOWN) :
-              terrainTiles[x][y] === Constants.TERRAIN_WATER ?
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_DOWN_SWIM) :
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_DOWN)
+            this.mobTileInfo[x][y]?.id === this.socketService.getSocketId() ?
+              this.terrainTileInfo[x][y] === Constants.TERRAIN_WATER ?
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_DOWN_SWIM) :
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_DOWN) :
+              this.terrainTileInfo[x][y] === Constants.TERRAIN_WATER ?
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_DOWN_SWIM) :
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_DOWN)
           }
-          else if(mobTiles[x][y]?.value === Constants.MOB_PLAYER_LEFT)
+          else if(this.mobTileInfo[x][y]?.value === Constants.MOB_PLAYER_LEFT)
           {
-            mobTiles[x][y]?.id === this.socketService.getSocketId() ?
-              terrainTiles[x][y] === Constants.TERRAIN_WATER ?
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_LEFT_SWIM) :
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_LEFT) :
-              terrainTiles[x][y] === Constants.TERRAIN_WATER ?
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_LEFT_SWIM) :
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_LEFT)
+            this.mobTileInfo[x][y]?.id === this.socketService.getSocketId() ?
+              this.terrainTileInfo[x][y] === Constants.TERRAIN_WATER ?
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_LEFT_SWIM) :
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_LEFT) :
+              this.terrainTileInfo[x][y] === Constants.TERRAIN_WATER ?
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_LEFT_SWIM) :
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_LEFT)
           }
-          else if(mobTiles[x][y]?.value === Constants.MOB_PLAYER_RIGHT)
+          else if(this.mobTileInfo[x][y]?.value === Constants.MOB_PLAYER_RIGHT)
           {
-            mobTiles[x][y]?.id === this.socketService.getSocketId() ?
-              terrainTiles[x][y] === Constants.TERRAIN_WATER ?
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_RIGHT_SWIM) :
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_RIGHT) :
-              terrainTiles[x][y] === Constants.TERRAIN_WATER ?
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_RIGHT_SWIM) :
-                this.mobMap[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_RIGHT)
+            this.mobTileInfo[x][y]?.id === this.socketService.getSocketId() ?
+            this.terrainTileInfo[x][y] === Constants.TERRAIN_WATER ?
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_RIGHT_SWIM) :
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_PLAYER_RIGHT) :
+              this.terrainTileInfo[x][y] === Constants.TERRAIN_WATER ?
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_RIGHT_SWIM) :
+                this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(Constants.MOB_OPPONENT_RIGHT)
           }
           else
           {
-            this.mobMap[relativeX][relativeY].texture = mobTextureList.get(mobTiles[x][y].value);
+            this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(this.mobTileInfo[x][y].value);
           }
         }
         else
         {
-          this.mobMap[relativeX][relativeY].texture = null;
+          this.mobGraphic[relativeX][relativeY].texture = null;
         }
-        if (objectTiles[x][y])
-          this.objectMap[relativeX][relativeY].texture = objectTextureList.get(objectTiles[x][y]);
+        if (this.objectTileInfo[x][y])
+          this.objectGraphic[relativeX][relativeY].texture = objectTextureList.get(this.objectTileInfo[x][y]);
         else
-          this.objectMap[relativeX][relativeY].texture = null;
-        this.terrainMap[relativeX][relativeY].texture = terrainTextureList.get(terrainTiles[x][y]);
+          this.objectGraphic[relativeX][relativeY].texture = null;
+        this.terrainGraphic[relativeX][relativeY].texture = terrainTextureList.get(this.terrainTileInfo[x][y]);
       }
     }
-    if (this.currentPlayer)
+  }
+
+  updateGameInfo(): void {
+    switch(this.gameStatus) {
+      case (Constants.GAME_STATUS_PLAYING):
+        this.gameState = GameState.Playing;
+        break;
+      case (Constants.GAME_STATUS_NOT_STARTED):
+        this.gameState = GameState.Starting;
+        break;
+      case (Constants.GAME_STATUS_FINISHED):
+        this.gameState = GameState.Finished;
+        break;
+    }
+  }
+
+  updatePlayerInfo(): void {
+    const currentPlayer = this.findPlayer();
+    if (currentPlayer?.alive)
+      this.menuState = MenuState.Playing;
+    else if (this.menuState === MenuState.Playing)
+      this.menuState = MenuState.Menu;
+
+    if (currentPlayer)
     {
-      this.currentPlayer.inventory.redKeys > 0 ?
+      currentPlayer.inventory.redKeys > 0 ?
         this.inventoryGraphic[0][0].texture = objectTextureList.get(Constants.OBJECT_RED_KEY) :
         this.inventoryGraphic[0][0].texture = terrainTextureList.get(Constants.TERRAIN_FLOOR);
 
-      this.currentPlayer.inventory.blueKeys > 0 ?
+      currentPlayer.inventory.blueKeys > 0 ?
         this.inventoryGraphic[0][1].texture = objectTextureList.get(Constants.OBJECT_BLUE_KEY) :
         this.inventoryGraphic[0][1].texture = terrainTextureList.get(Constants.TERRAIN_FLOOR);
 
-      this.currentPlayer.inventory.yellowKeys > 0 ?
+      currentPlayer.inventory.yellowKeys > 0 ?
         this.inventoryGraphic[0][2].texture = objectTextureList.get(Constants.OBJECT_YELLOW_KEY) :
         this.inventoryGraphic[0][2].texture = terrainTextureList.get(Constants.TERRAIN_FLOOR);
 
-      this.currentPlayer.inventory.greenKey === true ?
+      currentPlayer.inventory.greenKey === true ?
         this.inventoryGraphic[0][3].texture = objectTextureList.get(Constants.OBJECT_GREEN_KEY) :
         this.inventoryGraphic[0][3].texture = terrainTextureList.get(Constants.TERRAIN_FLOOR);
 
-      this.currentPlayer.inventory.iceSkates === true ?
+      currentPlayer.inventory.iceSkates === true ?
         this.inventoryGraphic[1][0].texture = objectTextureList.get(Constants.OBJECT_ICE_SKATES) :
         this.inventoryGraphic[1][0].texture = terrainTextureList.get(Constants.TERRAIN_FLOOR);
 
-      this.currentPlayer.inventory.forceBoots === true ?
+      currentPlayer.inventory.forceBoots === true ?
         this.inventoryGraphic[1][1].texture = objectTextureList.get(Constants.OBJECT_SUCTION_BOOTS) :
         this.inventoryGraphic[1][1].texture = terrainTextureList.get(Constants.TERRAIN_FLOOR);
 
-      this.currentPlayer.inventory.fireBoots === true ?
+      currentPlayer.inventory.fireBoots === true ?
         this.inventoryGraphic[1][2].texture = objectTextureList.get(Constants.OBJECT_FIRE_BOOTS) :
         this.inventoryGraphic[1][2].texture = terrainTextureList.get(Constants.TERRAIN_FLOOR);
 
-      this.currentPlayer.inventory.flippers === true ?
+      currentPlayer.inventory.flippers === true ?
         this.inventoryGraphic[1][3].texture = objectTextureList.get(Constants.OBJECT_FLIPPERS) :
         this.inventoryGraphic[1][3].texture = terrainTextureList.get(Constants.TERRAIN_FLOOR);
     }
+  }
+
+  updateScoreboard(): void {
     let thisPlayerInTopFive = false;
     for(let i = 0; i < 6; i++)
     {
-      if(this.playerList && this.playerList[i])
+      if(this.players && this.players[i])
       {
         if(i === 5 && !thisPlayerInTopFive)
         {
-          const currentPlayer = this.playerList.filter(player => player.id === this.socketService.getSocketId())[0];
-          const currentPlayerPosition = this.playerList
+          const currentPlayer = this.players.filter(player => player.id === this.socketService.getSocketId())[0];
+          const currentPlayerPosition = this.players
             .map(function(player) { return player.id; })
             .indexOf(this.socketService.getSocketId());
           if(currentPlayer)
@@ -542,9 +589,9 @@ export class AppComponent implements OnInit{
             this.leaderboardGraphic[i].text =
             (currentPlayerPosition + 1) +
             '. ' +
-            (this.playerList[currentPlayerPosition].name?.toLocaleUpperCase() || 'Chip') +
+            (this.players[currentPlayerPosition].name?.toLocaleUpperCase() || 'Chip') +
             ' - ' +
-            this.playerList[currentPlayerPosition].score;
+            this.players[currentPlayerPosition].score;
             this.leaderboardGraphic[i].style.fill = 0xffff00;
           }
         }
@@ -553,10 +600,10 @@ export class AppComponent implements OnInit{
           this.leaderboardGraphic[i].text =
           (i + 1) +
           '. ' +
-          (this.playerList[i].name?.toLocaleUpperCase() || 'Chip') +
+          (this.players[i].name?.toLocaleUpperCase() || 'Chip') +
           ' - ' +
-          this.playerList[i].score;
-          if (this.playerList[i].id === this.socketService.getSocketId())
+          this.players[i].score;
+          if (this.players[i].id === this.socketService.getSocketId())
           {
             this.leaderboardGraphic[i].style.fill = 0xffff00;
             thisPlayerInTopFive = true;
@@ -568,16 +615,12 @@ export class AppComponent implements OnInit{
       else
         this.leaderboardGraphic[i].text = '';
     }
-    this.timeRemainingGraphic.text = Math.floor(time / 60) + ':' + ("0" + (time % 60)).slice(-2);
-  }
-
-  updatePlayerList(playerList: Player[]): void {
-    this.playerList = playerList.sort((a, b) => ((a.score < b.score) || (b.winner === true)) ? 1 : -1);
-
-    if (this.playerList.find(player => player.id === this.socketService.getSocketId())?.alive)
-      this.menuState = MenuState.Playing;
-    else if (this.menuState === MenuState.Playing)
-      this.menuState = MenuState.Menu;
+    const timeToParse = this.gameStatus == Constants.GAME_STATUS_NOT_STARTED ?
+      Constants.GAMEPLAY_TIMER :
+      this.gameStatus == Constants.GAME_STATUS_FINISHED ?
+        0 :
+        this.time;
+    this.timeRemainingGraphic.text = Math.floor(timeToParse / 60) + ':' + ("0" + (timeToParse % 60)).slice(-2);
   }
 
   playGame(): void {
@@ -645,11 +688,11 @@ export class AppComponent implements OnInit{
     {
       this.menuState = MenuState.Loading;
       this.authService.createAccount(this.usernameForm.value, this.passwordForm.value, this.emailForm.value)
-        .subscribe((res) => {
+        .subscribe(() => {
           this.loginUsernameForm.setValue(this.usernameForm.value);
           this.loginPasswordForm.setValue(this.passwordForm.value);
           this.logIntoAccount();
-        }, (err) => {
+        }, () => {
           this.loginState = LoginState.Failed;
           this.menuState = MenuState.CreateAccount;
           this.userInfo = null;
@@ -657,10 +700,10 @@ export class AppComponent implements OnInit{
     }
   }
 
-  findPlayer(map: any[][]): number[] {
+  findPlayerCoordinates(): number[] {
     for (let x = 0; x < Constants.MAP_SIZE; x++) {
       for (let y = 0; y < Constants.MAP_SIZE; y++) {
-        const tile = map[x][y];
+        const tile = this.mobTileInfo[x][y];
         if (tile && this.tileIsPlayer(tile) && tile.id === this.socketService.getSocketId())
         {
           return [x, y];
@@ -668,6 +711,12 @@ export class AppComponent implements OnInit{
       }
     }
     return null;
+  }
+
+  findPlayer(): Player {
+    return this.players.filter(player => {
+      return player.id === this.socketService.getSocketId();
+    })[0];
   }
 
   private tileIsPlayer(tile: any)
@@ -685,5 +734,55 @@ export class AppComponent implements OnInit{
 
   getEloResultsForPlayer(name: string): EloResult {
     return this.eloResults ? this.eloResults.filter(result => result.id === name)[0] : null;
+  }
+
+  updateMobs(mobs: string) {
+    const listOfChanges = mobs.split(';');
+    listOfChanges.forEach(mobChange => {
+      const changeInfo = mobChange.split(':');
+      if (changeInfo.length == 3 && changeInfo[2] === '0') {
+        const x = changeInfo[0];
+        const y = changeInfo[1];
+        const newTile = changeInfo[2];
+        if (this.mobTileInfo)
+          this.mobTileInfo[x][y] = newTile;
+      } else if (changeInfo.length == 4) {
+        const x = changeInfo[0];
+        const y = changeInfo[1];
+        const id = changeInfo[2];
+        const value = changeInfo[3];
+
+        if (this.mobTileInfo)
+          this.mobTileInfo[x][y] = { id, value: parseInt(value) }
+      }
+    });
+  }
+
+  updateObjects(objects: string) {
+    const listOfChanges = objects.split(';');
+    listOfChanges.forEach(objectChange => {
+      const changeInfo = objectChange.split(':');
+      if (changeInfo.length == 3) {
+        const x = changeInfo[0];
+        const y = changeInfo[1];
+        const newTile = changeInfo[2];
+        if (this.objectTileInfo)
+          this.objectTileInfo[x][y] = parseInt(newTile);
+      }
+    });
+  }
+
+  updateTerrain(terrain: string) {
+    const listOfChanges = terrain.split(';');
+    listOfChanges.forEach(terrainChange => {
+      const changeInfo = terrainChange.split(':');
+      if (changeInfo.length == 3) {
+        const x = changeInfo[0];
+        const y = changeInfo[1];
+        const newTile = changeInfo[2];
+        if (this.terrainTileInfo)
+          this.terrainTileInfo[x][y] = parseInt(newTile);
+      }
+    });
   }
 }

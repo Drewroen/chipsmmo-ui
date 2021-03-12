@@ -23,7 +23,7 @@ export class SocketIOService {
   getData(socketEvent: string) {
     return new Observable(observer => {
       this.socket.on(socketEvent, msg => {
-        if(socketEvent === Constants.SOCKET_EVENT_UPDATE_GAME_MAP)
+        if(socketEvent === Constants.SOCKET_EVENT_UPDATE_GAME_MAP_FULL || socketEvent === Constants.SOCKET_EVENT_UPDATE_GAME_MAP_DELTA)
           msg = lz.decompress(msg);
         observer.next(msg);
       });

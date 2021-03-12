@@ -4,7 +4,6 @@ export class Player {
     score: number;
     alive: boolean;
     inventory: Inventory;
-    winner: boolean;
 
     constructor(id: string, name: string) {
         this.id = id;
@@ -12,7 +11,6 @@ export class Player {
         this.score = 0;
         this.alive = true;
         this.inventory = new Inventory();
-        this.winner = false;
     }
 }
 
