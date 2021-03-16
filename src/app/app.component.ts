@@ -65,7 +65,8 @@ const objectTextureList: Map<number, any> = new Map([
   [Constants.OBJECT_FIRE_BOOTS, PIXI.Texture.from('./../assets/CC_TILE_74_FIRE_BOOTS.png')],
   [Constants.OBJECT_FLIPPERS, PIXI.Texture.from('./../assets/CC_TILE_73_FLIPPERS.png')],
   [Constants.OBJECT_ICE_SKATES, PIXI.Texture.from('./../assets/CC_TILE_75_ICE_SKATES.png')],
-  [Constants.OBJECT_SUCTION_BOOTS, PIXI.Texture.from('./../assets/CC_TILE_76_SUCTION_BOOTS.png')]
+  [Constants.OBJECT_SUCTION_BOOTS, PIXI.Texture.from('./../assets/CC_TILE_76_SUCTION_BOOTS.png')],
+  [Constants.OBJECT_BOWLING_BALL, PIXI.Texture.from('./../assets/CC_TILE_91_BOWLING_BALL.png')]
 ]);
 
 const mobTextureList: Map<number, any> = new Map([
@@ -109,6 +110,7 @@ const mobTextureList: Map<number, any> = new Map([
   [Constants.MOB_OPPONENT_RIGHT_SWIM, PIXI.Texture.from('./../assets/CC_TILE_82_OPPONENT_RIGHT_SWIM.png')],
   [Constants.MOB_OPPONENT_DOWN_SWIM, PIXI.Texture.from('./../assets/CC_TILE_83_OPPONENT_DOWN_SWIM.png')],
   [Constants.MOB_OPPONENT_LEFT_SWIM, PIXI.Texture.from('./../assets/CC_TILE_84_OPPONENT_LEFT_SWIM.png')],
+  [Constants.MOB_BOWLING_BALL, PIXI.Texture.from('./../assets/CC_TILE_91_BOWLING_BALL.png')]
 ]);
 
 const gameAssets: Map<string, any> = new Map([
@@ -245,6 +247,8 @@ export class AppComponent implements OnInit{
         this.movementService.sendKeyDown(Constants.DIRECTION_RIGHT);
       else if (event.key === Constants.KEY_LEFT_ARROW)
         this.movementService.sendKeyDown(Constants.DIRECTION_LEFT);
+      else if (event.key === Constants.KEY_THROW_BOWLING_BALL)
+        this.movementService.sendKeyDown(Constants.THROW_BOWLING_BALL);
       else if (event.key === Constants.KEY_ENTER)
       {
         switch (this.menuState)
@@ -361,7 +365,7 @@ export class AppComponent implements OnInit{
     for(let i = 0; i < 2; i++)
     {
       const inventoryRow: any[] = new Array<any>();
-      for(let j = 0; j < 4; j++)
+      for(let j = 0; j < 5; j++)
       {
         const inventoryTile = new PIXI.Sprite(terrainTextureList.get(Constants.TERRAIN_FLOOR));
         const tileX = Constants.INVENTORY_TILES_X + (Constants.TILE_SIZE * j);
@@ -569,6 +573,10 @@ export class AppComponent implements OnInit{
       currentPlayer.inventory.flippers === true ?
         this.inventoryGraphic[1][3].texture = objectTextureList.get(Constants.OBJECT_FLIPPERS) :
         this.inventoryGraphic[1][3].texture = terrainTextureList.get(Constants.TERRAIN_FLOOR);
+
+      currentPlayer.inventory.bowlingBalls > 0 ?
+        this.inventoryGraphic[0][4].texture = objectTextureList.get(Constants.OBJECT_BOWLING_BALL) :
+        this.inventoryGraphic[0][4].texture = objectTextureList.get(Constants.TERRAIN_FLOOR);
     }
   }
 

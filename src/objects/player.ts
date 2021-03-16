@@ -23,6 +23,7 @@ export class Inventory {
   forceBoots: boolean;
   fireBoots: boolean;
   iceSkates: boolean;
+  bowlingBalls: number;
 
   constructor()
   {
@@ -34,5 +35,6 @@ export class Inventory {
     this.forceBoots = false;
     this.fireBoots = false;
     this.iceSkates = false;
+    this.bowlingBalls = 0;
   }
 }
