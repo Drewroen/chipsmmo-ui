@@ -113,6 +113,11 @@ const mobTextureList: Map<number, any> = new Map([
   [Constants.MOB_BOWLING_BALL, PIXI.Texture.from('./../assets/CC_TILE_91_BOWLING_BALL.png')]
 ]);
 
+const ownershipTextureList: Map<number, any> = new Map([
+  [Constants.OWNER_GREEN, PIXI.Texture.from('./../assets/CC_TILE_92_TEAM_GREEN.png')],
+  [Constants.OWNER_RED, PIXI.Texture.from('./../assets/CC_TILE_93_TEAM_RED.png')],
+]);
+
 const gameAssets: Map<string, any> = new Map([
   ['SIDE_PANEL', PIXI.Texture.from('./../assets/SIDE_PANEL.png')]
 ])
@@ -195,6 +200,8 @@ export class AppComponent implements OnInit{
   public terrainGraphic: any[][];
   public objectGraphic: any[][];
   public mobGraphic: any[][];
+  public ownershipGraphic: any[][];
+
   public inventoryGraphic: any[][];
   public leaderboardGraphic: any[];
   public timeRemainingGraphic: any;
@@ -331,35 +338,43 @@ export class AppComponent implements OnInit{
     this.terrainGraphic = new Array<Array<any>>();
     this.objectGraphic = new Array<Array<any>>();
     this.mobGraphic = new Array<Array<any>>();
+    this.ownershipGraphic = new Array<Array<any>>();
     this.inventoryGraphic = new Array<Array<any>>();
 
     for (let x = 0; x < Constants.MAP_VIEW_SIZE; x++) {
       const terrainRow: any[]  = new Array<any>();
       const objectRow: any[] = new Array<any>();
       const mobRow: any[] = new Array<any>();
+      const ownershipRow: any[] = new Array<any>();
       for (let y = 0; y < Constants.MAP_VIEW_SIZE; y++) {
         const tileX = x * Constants.TILE_SIZE;
         const tileY = y * Constants.TILE_SIZE;
         const mobTile = new PIXI.Sprite();
         const objectTile = new PIXI.Sprite();
         const terrainTile = new PIXI.Sprite(terrainTextureList.get(Constants.TERRAIN_FLOOR));
+        const ownershipTile = new PIXI.Sprite();
         terrainTile.x = tileX;
         terrainTile.y = tileY;
         objectTile.x = tileX;
         objectTile.y = tileY;
         mobTile.x = tileX;
         mobTile.y = tileY;
+        ownershipTile.x = tileX;
+        ownershipTile.y = tileY;
         this.app.stage.addChild(terrainTile);
         this.app.stage.addChild(objectTile);
         this.app.stage.addChild(mobTile);
+        this.app.stage.addChild(ownershipTile);
 
         terrainRow.push(terrainTile);
         objectRow.push(objectTile);
         mobRow.push(mobTile);
+        ownershipRow.push(ownershipTile);
       }
       this.terrainGraphic.push(terrainRow);
       this.objectGraphic.push(objectRow);
       this.mobGraphic.push(mobRow);
+      this.ownershipGraphic.push(ownershipRow);
     }
 
     for(let i = 0; i < 2; i++)
@@ -459,7 +474,7 @@ export class AppComponent implements OnInit{
       for (let relativeY = 0; relativeY < Constants.MAP_VIEW_SIZE; relativeY++) {
         const x = (playerCoords[0] + relativeX - Math.floor((Constants.MAP_VIEW_SIZE / 2)) + Constants.MAP_SIZE) % Constants.MAP_SIZE;
         const y = (playerCoords[1] + relativeY - Math.floor((Constants.MAP_VIEW_SIZE / 2)) + Constants.MAP_SIZE) % Constants.MAP_SIZE;
-        if(this.mobTileInfo[x][y])
+        if(this.mobTileInfo[x][y] && this.mobTileInfo[x][y] !== 0)
         {
           if(this.mobTileInfo[x][y]?.value === Constants.MOB_PLAYER_UP)
           {
@@ -505,10 +520,18 @@ export class AppComponent implements OnInit{
           {
             this.mobGraphic[relativeX][relativeY].texture = mobTextureList.get(this.mobTileInfo[x][y].value);
           }
+
+          if(this.mobTileInfo[x][y]?.owner === this.socketService.getSocketId())
+            this.ownershipGraphic[relativeX][relativeY].texture = ownershipTextureList.get(Constants.OWNER_GREEN);
+          else if (this.mobTileInfo[x][y]?.owner)
+            this.ownershipGraphic[relativeX][relativeY].texture = ownershipTextureList.get(Constants.OWNER_RED);
+          else
+            this.ownershipGraphic[relativeX][relativeY].texture = null;
         }
         else
         {
           this.mobGraphic[relativeX][relativeY].texture = null;
+          this.ownershipGraphic[relativeX][relativeY].texture = null;
         }
         if (this.objectTileInfo[x][y])
           this.objectGraphic[relativeX][relativeY].texture = objectTextureList.get(this.objectTileInfo[x][y]);
@@ -751,17 +774,18 @@ export class AppComponent implements OnInit{
       if (changeInfo.length == 3 && changeInfo[2] === '0') {
         const x = changeInfo[0];
         const y = changeInfo[1];
-        const newTile = changeInfo[2];
+        const newTile = 0;
         if (this.mobTileInfo)
           this.mobTileInfo[x][y] = newTile;
-      } else if (changeInfo.length == 4) {
+      } else if (changeInfo.length == 5) {
         const x = changeInfo[0];
         const y = changeInfo[1];
         const id = changeInfo[2];
         const value = changeInfo[3];
+        const owner = changeInfo[4];
 
         if (this.mobTileInfo)
-          this.mobTileInfo[x][y] = { id, value: parseInt(value) }
+          this.mobTileInfo[x][y] = { id, value: parseInt(value), owner: owner === '0' ? null : owner }
       }
     });
   }

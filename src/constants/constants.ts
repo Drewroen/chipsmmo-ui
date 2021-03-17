@@ -125,6 +125,9 @@ export class Constants {
     public static readonly OBJECT_BOWLING_BALL = 100;
     public static readonly MOB_BOWLING_BALL = 101;
 
+    public static readonly OWNER_GREEN = 1000;
+    public static readonly OWNER_RED = 1001;
+
     public static readonly DIRECTION_UP = 0;
     public static readonly DIRECTION_RIGHT = 1;
     public static readonly DIRECTION_DOWN = 2;
