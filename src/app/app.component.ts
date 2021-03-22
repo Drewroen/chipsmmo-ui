@@ -66,7 +66,8 @@ const objectTextureList: Map<number, any> = new Map([
   [Constants.OBJECT_FLIPPERS, PIXI.Texture.from('./../assets/CC_TILE_73_FLIPPERS.png')],
   [Constants.OBJECT_ICE_SKATES, PIXI.Texture.from('./../assets/CC_TILE_75_ICE_SKATES.png')],
   [Constants.OBJECT_SUCTION_BOOTS, PIXI.Texture.from('./../assets/CC_TILE_76_SUCTION_BOOTS.png')],
-  [Constants.OBJECT_BOWLING_BALL, PIXI.Texture.from('./../assets/CC_TILE_91_BOWLING_BALL.png')]
+  [Constants.OBJECT_BOWLING_BALL, PIXI.Texture.from('./../assets/CC_TILE_91_BOWLING_BALL.png')],
+  [Constants.OBJECT_WHISTLE, PIXI.Texture.from('./../assets/CC_TILE_95_WHISTLE.png')]
 ]);
 
 const mobTextureList: Map<number, any> = new Map([
@@ -110,7 +111,8 @@ const mobTextureList: Map<number, any> = new Map([
   [Constants.MOB_OPPONENT_RIGHT_SWIM, PIXI.Texture.from('./../assets/CC_TILE_82_OPPONENT_RIGHT_SWIM.png')],
   [Constants.MOB_OPPONENT_DOWN_SWIM, PIXI.Texture.from('./../assets/CC_TILE_83_OPPONENT_DOWN_SWIM.png')],
   [Constants.MOB_OPPONENT_LEFT_SWIM, PIXI.Texture.from('./../assets/CC_TILE_84_OPPONENT_LEFT_SWIM.png')],
-  [Constants.MOB_BOWLING_BALL, PIXI.Texture.from('./../assets/CC_TILE_91_BOWLING_BALL.png')]
+  [Constants.MOB_BOWLING_BALL, PIXI.Texture.from('./../assets/CC_TILE_91_BOWLING_BALL.png')],
+  [Constants.MOB_BLOCK_BROKEN, PIXI.Texture.from('./../assets/CC_TILE_94_BROKEN_BLOCK.png')]
 ]);
 
 const ownershipTextureList: Map<number, any> = new Map([
@@ -123,7 +125,7 @@ const gameAssets: Map<string, any> = new Map([
 ])
 
 export enum MenuState {
-  Menu, Login, Playing, Loading, Lobbies, CreateAccount
+  Menu, Login, Playing, Respawning, Loading, Lobbies, CreateAccount
 }
 
 export enum LoginState {
@@ -256,6 +258,8 @@ export class AppComponent implements OnInit{
         this.movementService.sendKeyDown(Constants.DIRECTION_LEFT);
       else if (event.key === Constants.KEY_THROW_BOWLING_BALL)
         this.movementService.sendKeyDown(Constants.THROW_BOWLING_BALL);
+      else if (event.key === Constants.KEY_CALL_WHISTLE)
+        this.movementService.sendKeyDown(Constants.CALL_WHISTLE)
       else if (event.key === Constants.KEY_ENTER)
       {
         switch (this.menuState)
@@ -558,10 +562,14 @@ export class AppComponent implements OnInit{
 
   updatePlayerInfo(): void {
     const currentPlayer = this.findPlayer();
-    if (currentPlayer?.alive)
+    if (!currentPlayer || currentPlayer.quit) {
+      if ([MenuState.Playing, MenuState.Respawning].includes(this.menuState))
+        this.menuState = MenuState.Menu;
+    }
+    else if (currentPlayer.alive)
       this.menuState = MenuState.Playing;
-    else if (this.menuState === MenuState.Playing)
-      this.menuState = MenuState.Menu;
+    else if (!currentPlayer.alive)
+      this.menuState = MenuState.Respawning;
 
     if (currentPlayer)
     {
@@ -600,6 +608,10 @@ export class AppComponent implements OnInit{
       currentPlayer.inventory.bowlingBalls > 0 ?
         this.inventoryGraphic[0][4].texture = objectTextureList.get(Constants.OBJECT_BOWLING_BALL) :
         this.inventoryGraphic[0][4].texture = objectTextureList.get(Constants.TERRAIN_FLOOR);
+
+      currentPlayer.inventory.whistles > 0 ?
+        this.inventoryGraphic[1][4].texture = objectTextureList.get(Constants.OBJECT_WHISTLE) :
+        this.inventoryGraphic[1][4].texture = objectTextureList.get(Constants.TERRAIN_FLOOR);
     }
   }
 

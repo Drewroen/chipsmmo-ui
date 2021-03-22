@@ -4,6 +4,7 @@ export class Player {
     score: number;
     alive: boolean;
     inventory: Inventory;
+    quit: boolean;
 
     constructor(id: string, name: string) {
         this.id = id;
@@ -11,6 +12,7 @@ export class Player {
         this.score = 0;
         this.alive = true;
         this.inventory = new Inventory();
+        this.quit = false;
     }
 }
 
@@ -24,6 +26,7 @@ export class Inventory {
   fireBoots: boolean;
   iceSkates: boolean;
   bowlingBalls: number;
+  whistles: number;
 
   constructor()
   {
@@ -36,5 +39,6 @@ export class Inventory {
     this.fireBoots = false;
     this.iceSkates = false;
     this.bowlingBalls = 0;
+    this.whistles = 0;
   }
 }

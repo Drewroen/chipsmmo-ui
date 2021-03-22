@@ -13,7 +13,7 @@
   width: 160px;
 }
 
-#startInput, #waitingMessage, #loadingMessage, #loginInput, #lobbiesInput, #createAccountInput {
+#startInput, #waitingMessage, #loadingMessage, #respawnMessage, #loginInput, #lobbiesInput, #createAccountInput {
   background: white;
   padding: 10px;
   position: absolute;

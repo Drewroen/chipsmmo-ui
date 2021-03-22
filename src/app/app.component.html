@@ -55,6 +55,9 @@
     <div id="loadingMessage" *ngIf="menuState === MenuStates.Loading">
       Loading...
     </div>
+    <div id="respawnMessage" *ngIf="menuState === MenuStates.Respawning">
+      Respawning soon...
+    </div>
     <div id="lobbiesInput" *ngIf="menuState === MenuStates.Lobbies">
       <div *ngFor="let room of rooms">
         <button (click)="joinRoom(room.name)" class="btn btn-dark" [disabled]="room.playerCount >= room.maxPlayerCount" [ngClass]="{'currentRoom': currentRoom.name === room.name}">{{room.name}} - {{room.playerCount}}/{{room.maxPlayerCount}} ({{room.type === 1 ? 'Competitive' : 'Casual'}})</button>
