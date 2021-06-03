@@ -12,7 +12,7 @@
           <div class="titleText">Hi, Chip!</div>
           <div class="subText">Create an account to pick your own username.</div>
         </div>
-        <div class="errorText"><strong>NOTE: This site is in early development! Account info will NOT stay!</strong></div>
+        <div class="errorText"><strong>NOTE: This site is in early development! Do not expect account info to stick around!</strong></div>
         <div class="errorText">The good news? Making an account takes about 5 seconds.</div>
         <button (click)="playGame()" class="btn btn-dark">Play</button>
         <button (click)="goToLogin()" *ngIf="loginState !== LoginStates.LoggedIn" class="btn btn-dark">Login/Create</button>
@@ -28,34 +28,15 @@
       <div class="subText"><a (click)="goToCreateAccount()">Create an account</a> to pick your own username.</div>
       <div class="errorText" *ngIf="loginState == LoginStates.Failed">Failed to login.</div>
     </form>
-    <div id="waitingMessage" *ngIf="menuState === MenuStates.Playing && gameState !== GameStates.Playing">
+    <div id="waitingMessage" *ngIf="menuState === MenuStates.Playing && gameState === GameStates.Starting">
       <div *ngIf="gameState === GameStates.Starting">
         Starting in {{ time }} seconds...
-      </div>
-      <div *ngIf="gameState === GameStates.Finished">
-        <div class="winnerText">
-          Game over!
-        </div>
-        <div class="fullScores">
-          Full scores:
-          <div *ngFor="let player of players; index as place">
-            <div *ngIf="!getEloResultsForPlayer(player.name)">
-              {{ place + 1 }}. {{ player.name }}
-            </div>
-            <div *ngIf="getEloResultsForPlayer(player.name)">
-              {{ place + 1 }}. {{ player.name }} ({{ getEloResultsForPlayer(player.name)?.previousElo }} => {{ getEloResultsForPlayer(player.name)?.newElo }})
-            </div>
-          </div>
-        </div>
-        <div class="timerText">
-          Restarting in {{ time }} seconds...
-        </div>
       </div>
     </div>
     <div id="loadingMessage" *ngIf="menuState === MenuStates.Loading">
       Loading...
     </div>
-    <div id="respawnMessage" *ngIf="menuState === MenuStates.Respawning">
+    <div id="respawnMessage" *ngIf="menuState === MenuStates.Respawning && gameState === GameStates.Playing">
       Respawning soon...
     </div>
     <div id="lobbiesInput" *ngIf="menuState === MenuStates.Lobbies">

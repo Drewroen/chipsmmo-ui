@@ -121,7 +121,31 @@ const ownershipTextureList: Map<number, any> = new Map([
 ]);
 
 const gameAssets: Map<string, any> = new Map([
-  ['SIDE_PANEL', PIXI.Texture.from('./../assets/SIDE_PANEL.png')]
+  ['SIDE_PANEL', PIXI.Texture.from('./../assets/SIDE_PANEL.png')],
+  ['MAIN_PANEL', PIXI.Texture.from('./../assets/MAIN_PANEL.png')],
+  ['ENDGAME_PANEL', PIXI.Texture.from('./../assets/GAME_OVER_PANEL.png')],
+  ['GREEN_0', PIXI.Texture.from('./../assets/DIGIT_0_GREEN.png')],
+  ['YELLOW_0', PIXI.Texture.from('./../assets/DIGIT_0_YELLOW.png')],
+  ['GREEN_1', PIXI.Texture.from('./../assets/DIGIT_1_GREEN.png')],
+  ['YELLOW_1', PIXI.Texture.from('./../assets/DIGIT_1_YELLOW.png')],
+  ['GREEN_2', PIXI.Texture.from('./../assets/DIGIT_2_GREEN.png')],
+  ['YELLOW_2', PIXI.Texture.from('./../assets/DIGIT_2_YELLOW.png')],
+  ['GREEN_3', PIXI.Texture.from('./../assets/DIGIT_3_GREEN.png')],
+  ['YELLOW_3', PIXI.Texture.from('./../assets/DIGIT_3_YELLOW.png')],
+  ['GREEN_4', PIXI.Texture.from('./../assets/DIGIT_4_GREEN.png')],
+  ['YELLOW_4', PIXI.Texture.from('./../assets/DIGIT_4_YELLOW.png')],
+  ['GREEN_5', PIXI.Texture.from('./../assets/DIGIT_5_GREEN.png')],
+  ['YELLOW_5', PIXI.Texture.from('./../assets/DIGIT_5_YELLOW.png')],
+  ['GREEN_6', PIXI.Texture.from('./../assets/DIGIT_6_GREEN.png')],
+  ['YELLOW_6', PIXI.Texture.from('./../assets/DIGIT_6_YELLOW.png')],
+  ['GREEN_7', PIXI.Texture.from('./../assets/DIGIT_7_GREEN.png')],
+  ['YELLOW_7', PIXI.Texture.from('./../assets/DIGIT_7_YELLOW.png')],
+  ['GREEN_8', PIXI.Texture.from('./../assets/DIGIT_8_GREEN.png')],
+  ['YELLOW_8', PIXI.Texture.from('./../assets/DIGIT_8_YELLOW.png')],
+  ['GREEN_9', PIXI.Texture.from('./../assets/DIGIT_9_GREEN.png')],
+  ['YELLOW_9', PIXI.Texture.from('./../assets/DIGIT_9_YELLOW.png')],
+  ['GREEN_EMPTY', PIXI.Texture.from('./../assets/DIGIT_EMPTY_GREEN.png')],
+  ['YELLOW_EMPTY', PIXI.Texture.from('./../assets/DIGIT_EMPTY_YELLOW.png')],
 ])
 
 export enum MenuState {
@@ -183,9 +207,8 @@ export class AppComponent implements OnInit{
   private authService: AuthService;
 
   public app: any = new PIXI.Application(
-    (Constants.MAP_VIEW_SIZE * Constants.TILE_SIZE) + Constants.INVENTORY_PIXELS,
-    Constants.MAP_VIEW_SIZE * Constants.TILE_SIZE,
-    { backgroundColor: 0x999999 }
+    300 + Constants.INVENTORY_PIXELS + 13, 370,
+    { transparent: true }
   );
 
   // Stores up to date information on the terrain/object/mob values on the map
@@ -206,7 +229,10 @@ export class AppComponent implements OnInit{
 
   public inventoryGraphic: any[][];
   public leaderboardGraphic: any[];
-  public timeRemainingGraphic: any;
+  public timeRemainingGraphic: any[];
+  public endGameGraphic: any;
+  public endGameText: any[];
+  public endGameCurrentPlayerPlace: any;
 
   public container = new PIXI.Container();
 
@@ -237,30 +263,30 @@ export class AppComponent implements OnInit{
   keyEvent(event: KeyboardEvent) {
     if (event.type === 'keyup')
     {
-      if (event.key === Constants.KEY_UP_ARROW)
+      if (event.key === Constants.DEFAULT_KEY_UP_ARROW)
         this.movementService.sendKeyUp(Constants.DIRECTION_UP);
-      else if (event.key === Constants.KEY_DOWN_ARROW)
+      else if (event.key === Constants.DEFAULT_KEY_DOWN_ARROW)
         this.movementService.sendKeyUp(Constants.DIRECTION_DOWN);
-      else if (event.key === Constants.KEY_RIGHT_ARROW)
+      else if (event.key === Constants.DEFAULT_KEY_RIGHT_ARROW)
         this.movementService.sendKeyUp(Constants.DIRECTION_RIGHT);
-      else if (event.key === Constants.KEY_LEFT_ARROW)
+      else if (event.key === Constants.DEFAULT_KEY_LEFT_ARROW)
         this.movementService.sendKeyUp(Constants.DIRECTION_LEFT);
     }
     else if (event.type === 'keydown')
     {
-      if (event.key === Constants.KEY_UP_ARROW)
+      if (event.key === Constants.DEFAULT_KEY_UP_ARROW)
         this.movementService.sendKeyDown(Constants.DIRECTION_UP);
-      else if (event.key === Constants.KEY_DOWN_ARROW)
+      else if (event.key === Constants.DEFAULT_KEY_DOWN_ARROW)
         this.movementService.sendKeyDown(Constants.DIRECTION_DOWN);
-      else if (event.key === Constants.KEY_RIGHT_ARROW)
+      else if (event.key === Constants.DEFAULT_KEY_RIGHT_ARROW)
         this.movementService.sendKeyDown(Constants.DIRECTION_RIGHT);
-      else if (event.key === Constants.KEY_LEFT_ARROW)
+      else if (event.key === Constants.DEFAULT_KEY_LEFT_ARROW)
         this.movementService.sendKeyDown(Constants.DIRECTION_LEFT);
-      else if (event.key === Constants.KEY_THROW_BOWLING_BALL)
+      else if (event.key === Constants.DEFAULT_KEY_THROW_BOWLING_BALL)
         this.movementService.sendKeyDown(Constants.THROW_BOWLING_BALL);
-      else if (event.key === Constants.KEY_CALL_WHISTLE)
+      else if (event.key === Constants.DEFAULT_KEY_CALL_WHISTLE)
         this.movementService.sendKeyDown(Constants.CALL_WHISTLE)
-      else if (event.key === Constants.KEY_ENTER)
+      else if (event.key === Constants.DEFAULT_KEY_ENTER)
       {
         switch (this.menuState)
         {
@@ -313,28 +339,34 @@ export class AppComponent implements OnInit{
 
     document.getElementById('map').appendChild(this.app.view);
 
+    const mainPanel = new PIXI.Sprite(gameAssets.get('MAIN_PANEL'));
+    mainPanel.x = 0;
+    mainPanel.y = 35;
+    this.app.stage.addChild(mainPanel);
+
     const sidePanel = new PIXI.Sprite(gameAssets.get('SIDE_PANEL'));
-    sidePanel.x = Constants.TILE_SIZE * Constants.MAP_VIEW_SIZE;
-    sidePanel.y = 0;
+    sidePanel.x = Constants.MAIN_PANEL_SIZE + 13;
+    sidePanel.y = 35;
     this.app.stage.addChild(sidePanel);
 
-    this.timeRemainingGraphic = new PIXI.Text('0:00', {font:'20px Arial', fill:0xffff00, fontWeight:'bold'})
-    this.timeRemainingGraphic.x = Constants.MAP_VIEW_SIZE * Constants.TILE_SIZE + 17;
-    this.timeRemainingGraphic.y = 9;
-    this.app.stage.addChild(this.timeRemainingGraphic);
-
-    const leaderboardText = new PIXI.Text('LEADERBOARD', {font:'20px Arial', fill:0xffff00, fontWeight:'bold'});
-    leaderboardText.x = Constants.MAP_VIEW_SIZE * Constants.TILE_SIZE + 17;
-    leaderboardText.y = 37;
-    this.app.stage.addChild(leaderboardText);
+    this.timeRemainingGraphic = new Array<any>();
+    for(var i = 0; i < 3; i++)
+    {
+      const timeGraphic = new PIXI.Sprite(gameAssets.get('GREEN_EMPTY'));
+      timeGraphic.x = Constants.MAIN_PANEL_SIZE + 101 + (i * 17);
+      timeGraphic.y = 76;
+      this.app.stage.addChild(timeGraphic);
+      this.timeRemainingGraphic.push(timeGraphic);
+    }
 
     this.leaderboardGraphic = new Array<any>();
 
     for(let i = 0; i < 6; i++)
     {
-      const playerScoreGraphic = new PIXI.Text('', {font:'14px Arial', fill:0xffff00, fontWeight:'normal'});
-      playerScoreGraphic.x = Constants.MAP_VIEW_SIZE * Constants.TILE_SIZE + 17;
-      playerScoreGraphic.y = 69 + (i * 22);
+      const playerScoreGraphic = new PIXI.Text('', {font:'14px Arial', fill:0x000000, fontWeight:'normal'});
+      playerScoreGraphic.x = Constants.MAIN_PANEL_SIZE + 122;
+      playerScoreGraphic.y = 139 + (i * 18);
+      playerScoreGraphic.anchor.set(0.5);
       this.app.stage.addChild(playerScoreGraphic);
       this.leaderboardGraphic.push(playerScoreGraphic);
     }
@@ -351,8 +383,8 @@ export class AppComponent implements OnInit{
       const mobRow: any[] = new Array<any>();
       const ownershipRow: any[] = new Array<any>();
       for (let y = 0; y < Constants.MAP_VIEW_SIZE; y++) {
-        const tileX = x * Constants.TILE_SIZE;
-        const tileY = y * Constants.TILE_SIZE;
+        const tileX = x * Constants.TILE_SIZE + 6;
+        const tileY = y * Constants.TILE_SIZE + 41;
         const mobTile = new PIXI.Sprite();
         const objectTile = new PIXI.Sprite();
         const terrainTile = new PIXI.Sprite(terrainTextureList.get(Constants.TERRAIN_FLOOR));
@@ -387,8 +419,8 @@ export class AppComponent implements OnInit{
       for(let j = 0; j < 5; j++)
       {
         const inventoryTile = new PIXI.Sprite(terrainTextureList.get(Constants.TERRAIN_FLOOR));
-        const tileX = Constants.INVENTORY_TILES_X + (Constants.TILE_SIZE * j);
-        const tileY = Constants.INVENTORY_TILES_Y + (Constants.TILE_SIZE * i);
+        const tileX = Constants.MAIN_PANEL_SIZE + Constants.TILE_SIZE + (Constants.TILE_SIZE * j) + 13;
+        const tileY = Constants.INVENTORY_TILES_Y + (Constants.TILE_SIZE * i) + 35;
         inventoryTile.x = tileX;
         inventoryTile.y = tileY;
         this.app.stage.addChild(inventoryTile);
@@ -396,6 +428,37 @@ export class AppComponent implements OnInit{
       }
       this.inventoryGraphic.push(inventoryRow);
     }
+
+    const endGameGraphic = new PIXI.Sprite();
+    endGameGraphic.x = 127;
+    endGameGraphic.y = 0;
+    endGameGraphic.texture = null;
+    this.app.stage.addChild(endGameGraphic);
+    this.endGameGraphic = endGameGraphic;
+
+    this.endGameText = new Array<any>();
+    for(let i = 0; i < 8; i++)
+    {
+      const playerScoreGraphic = new PIXI.Text('', {font:'60px Arial', fill:0x000000, fontWeight:600});
+      playerScoreGraphic.x = 268;
+      playerScoreGraphic.y = 128 + (i * 22);
+      playerScoreGraphic.scale.x = .3;
+      playerScoreGraphic.scale.y = .3;
+      playerScoreGraphic.anchor.set(0.5);
+      this.app.stage.addChild(playerScoreGraphic);
+      this.endGameText.push(playerScoreGraphic);
+    }
+
+    const currentPlayerPlaceGraphic = new PIXI.Text('', {font:'72px Arial', fill:0x000000, fontWeight:600});
+    currentPlayerPlaceGraphic.x = 268;
+    currentPlayerPlaceGraphic.y = 336;
+    currentPlayerPlaceGraphic.scale.x = .3;
+    currentPlayerPlaceGraphic.scale.y = .3;
+    currentPlayerPlaceGraphic.anchor.set(0.5);
+    this.app.stage.addChild(currentPlayerPlaceGraphic);
+    this.endGameCurrentPlayerPlace = currentPlayerPlaceGraphic;
+
+
 
     this.gameMapSub = this.socketService.getData(Constants.SOCKET_EVENT_UPDATE_GAME_MAP_FULL)
       .subscribe((dataString: any) => {
@@ -406,12 +469,12 @@ export class AppComponent implements OnInit{
           this.terrainTileInfo = data.terrain;
         if (data.object)
           this.objectTileInfo = data.object;
-        if (data.players)
-          this.players = (data.players as Player[]).sort((a, b) => (a.score < b.score) ? 1 : -1);;
         if (data.gameStatus !== undefined)
         {
           this.gameStatus = data.gameStatus;
         }
+        if (data.players && this.gameStatus !== Constants.GAME_STATUS_FINISHED)
+          this.players = (data.players as Player[]).sort((a, b) => (a.score < b.score) ? 1 : -1);;
         if (data.time)
           this.time = data.time;
 
@@ -421,6 +484,10 @@ export class AppComponent implements OnInit{
           this.updatePlayerInfo();
           this.updateScoreboard();
           this.updateGameInfo();
+          if (this.gameState == GameState.Finished)
+            this.updateEndGameInfo();
+          else
+            this.resetEndGameInfo();
         }
     });
 
@@ -434,12 +501,12 @@ export class AppComponent implements OnInit{
           this.updateTerrain(data.terrain);
         if (data.object)
           this.updateObjects(data.object);
-        if (data.players)
-          this.players = (data.players as Player[]).sort((a, b) => (a.score < b.score) ? 1 : -1);;
         if (data.gameStatus !== undefined)
         {
           this.gameStatus = data.gameStatus;
         }
+        if (data.players  && this.gameStatus !== Constants.GAME_STATUS_FINISHED)
+          this.players = (data.players as Player[]).sort((a, b) => (a.score < b.score) ? 1 : -1);;
         if (data.time)
           this.time = data.time;
 
@@ -635,7 +702,6 @@ export class AppComponent implements OnInit{
             (this.players[currentPlayerPosition].name?.toLocaleUpperCase() || 'Chip') +
             ' - ' +
             this.players[currentPlayerPosition].score;
-            this.leaderboardGraphic[i].style.fill = 0xffff00;
           }
         }
         else
@@ -648,11 +714,11 @@ export class AppComponent implements OnInit{
           this.players[i].score;
           if (this.players[i].id === this.socketService.getSocketId())
           {
-            this.leaderboardGraphic[i].style.fill = 0xffff00;
+            this.leaderboardGraphic[i].style.fontWeight = 600;
             thisPlayerInTopFive = true;
           }
           else
-            this.leaderboardGraphic[i].style.fill = 0xdddd00;
+            this.leaderboardGraphic[i].style.fontWeight = 300;
         }
       }
       else
@@ -663,7 +729,60 @@ export class AppComponent implements OnInit{
       this.gameStatus == Constants.GAME_STATUS_FINISHED ?
         0 :
         this.time;
-    this.timeRemainingGraphic.text = Math.floor(timeToParse / 60) + ':' + ("0" + (timeToParse % 60)).slice(-2);
+
+    let firstDigit = Math.floor(timeToParse / 100).toString();
+    let secondDigit = Math.floor((timeToParse % 100) / 10).toString();
+    let thirdDigit = (timeToParse % 10).toString();
+
+    const color = timeToParse < 30 ? 'YELLOW_' : 'GREEN_';
+
+    if (firstDigit === '0')
+      firstDigit = 'EMPTY';
+    if (secondDigit === '0' && firstDigit === 'EMPTY')
+      secondDigit = 'EMPTY';
+
+    this.timeRemainingGraphic[0].texture = gameAssets.get(color + firstDigit);
+    this.timeRemainingGraphic[1].texture = gameAssets.get(color + secondDigit);
+    this.timeRemainingGraphic[2].texture = gameAssets.get(color + thirdDigit);
+  }
+
+  updateEndGameInfo(): void {
+    const currentPlayer = this.players.filter(player => player.id === this.socketService.getSocketId())[0];
+    const currentPlayerPosition = this.players
+            .map(function(player) { return player.id; })
+            .indexOf(this.socketService.getSocketId());
+    this.endGameCurrentPlayerPlace.text = (currentPlayerPosition + 1) + '. ' + currentPlayer.name;
+
+    this.endGameGraphic.texture = gameAssets.get('ENDGAME_PANEL');
+
+    for(var i = 0; i < 8; i++) {
+      if(this.players[i]) {
+        var scoreText = ""
+        scoreText += (i + 1) + ". " + this.players[i].name + " - " + this.players[i].score
+        if (this.eloResults) {
+          var eloInfo = this.eloResults.filter(elo => elo.id == this.players[i].name)[0];
+          if (eloInfo) {
+            if (eloInfo.previousElo < eloInfo.newElo)
+              scoreText += " (" + eloInfo.previousElo + "▲" + eloInfo.newElo + ")";
+            else if (eloInfo.previousElo > eloInfo.newElo)
+              scoreText += " (" + eloInfo.previousElo + "▼" + eloInfo.newElo + ")";
+            else
+              scoreText += " (" + eloInfo.previousElo + "◆" + eloInfo.newElo + ")";
+          }
+
+        }
+        this.endGameText[i].text = scoreText;
+      }
+    }
+  }
+
+  resetEndGameInfo(): void {
+    this.endGameCurrentPlayerPlace.text = '';
+    this.endGameGraphic.texture = null;
+    for(var i = 0; i < 8; i++) {
+      this.endGameText[i].text = null;
+    }
+    this.eloResults = null;
   }
 
   playGame(): void {
@@ -773,10 +892,6 @@ export class AppComponent implements OnInit{
   joinRoom(roomName: string): void {
     const roomNumber = GAME_ROOMS.map(room => room.name).indexOf(roomName);
     this.socketService.sendData(Constants.SOCKET_EVENT_JOIN_ROOM, roomNumber);
-  }
-
-  getEloResultsForPlayer(name: string): EloResult {
-    return this.eloResults ? this.eloResults.filter(result => result.id === name)[0] : null;
   }
 
   updateMobs(mobs: string) {

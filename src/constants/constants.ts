@@ -3,10 +3,11 @@ export class Constants {
     public static readonly MAP_VIEW_SIZE = 9;
     public static readonly TILE_SIZE = 32;
     public static readonly GAME_LOBBY_MAX_SIZE = 16;
+    public static readonly MAIN_PANEL_SIZE = 300;
 
     public static readonly INVENTORY_PIXELS = 224;
     public static readonly INVENTORY_TILES_X = 320;
-    public static readonly INVENTORY_TILES_Y = 208;
+    public static readonly INVENTORY_TILES_Y = 220;
 
     public static readonly SOCKET_EVENT_KEYDOWN = 'keydown';
     public static readonly SOCKET_EVENT_KEYUP = 'keyup';
@@ -22,13 +23,13 @@ export class Constants {
     public static readonly SOCKET_EVENT_MULTILOGIN = 'multiplelogins';
     public static readonly SOCKET_EVENT_UPDATE_ELO = 'sendNewElos';
 
-    public static readonly KEY_UP_ARROW = 'ArrowUp';
-    public static readonly KEY_DOWN_ARROW = 'ArrowDown';
-    public static readonly KEY_LEFT_ARROW = 'ArrowLeft';
-    public static readonly KEY_RIGHT_ARROW = 'ArrowRight';
-    public static readonly KEY_ENTER = 'Enter';
-    public static readonly KEY_THROW_BOWLING_BALL = 'q';
-    public static readonly KEY_CALL_WHISTLE = 'w';
+    public static readonly DEFAULT_KEY_UP_ARROW = 'ArrowUp';
+    public static readonly DEFAULT_KEY_DOWN_ARROW = 'ArrowDown';
+    public static readonly DEFAULT_KEY_LEFT_ARROW = 'ArrowLeft';
+    public static readonly DEFAULT_KEY_RIGHT_ARROW = 'ArrowRight';
+    public static readonly DEFAULT_KEY_ENTER = 'Enter';
+    public static readonly DEFAULT_KEY_THROW_BOWLING_BALL = 'q';
+    public static readonly DEFAULT_KEY_CALL_WHISTLE = 'w';
 
     public static readonly TERRAIN_FLOOR = 0;
     public static readonly TERRAIN_WALL = 1;
