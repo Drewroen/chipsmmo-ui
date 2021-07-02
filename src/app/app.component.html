@@ -20,17 +20,17 @@
         <button (click)="goToLobbies()" class="btn btn-dark">Lobbies</button>
       </div>
     </div>
-    <form id="loginInput" *ngIf="menuState === MenuStates.Login" [formGroup]="loginForm" (ngSubmit)="logIntoAccount()">
+    <form id="loginInput" *ngIf="menuState === MenuStates.Login" [formGroup]="forms.loginForm" (ngSubmit)="logIntoAccount()">
       <input formControlName="username" type="text" placeholder="Username">
       <input formControlName="password" type="password" placeholder="Password">
-      <button type="submit" class="btn btn-dark" [disabled]="!loginForm.valid">Login</button>
+      <button type="submit" class="btn btn-dark" [disabled]="!forms.loginForm.valid">Login</button>
       <button (click)="goToMenu()" class="btn btn-dark">Cancel</button>
       <div class="subText"><a (click)="goToCreateAccount()">Create an account</a> to pick your own username.</div>
       <div class="errorText" *ngIf="loginState == LoginStates.Failed">Failed to login.</div>
     </form>
     <div id="waitingMessage" *ngIf="menuState === MenuStates.Playing && gameState === GameStates.Starting">
       <div *ngIf="gameState === GameStates.Starting">
-        Starting in {{ time }} seconds...
+        Starting in {{ gameInformation.time }} seconds...
       </div>
     </div>
     <div id="loadingMessage" *ngIf="menuState === MenuStates.Loading">
@@ -45,13 +45,13 @@
       </div>
       <button (click)="goToMenu()" class="btn btn-dark">Back</button>
     </div>
-    <form id="loginInput" *ngIf="menuState === MenuStates.CreateAccount" [formGroup]="createAccountForm" (ngSubmit)="createAccount()">
+    <form id="loginInput" *ngIf="menuState === MenuStates.CreateAccount" [formGroup]="forms.createAccountForm" (ngSubmit)="createAccount()">
       <input formControlName="username" type="text" placeholder="Username">
       <input formControlName="password" type="password" placeholder="Password">
       <input formControlName="confirmPassword" type="password" placeholder="Confirm Password">
       <input formControlName="email" type="text" placeholder="Email (Optional)">
-      <button type="submit" class="btn btn-dark" [disabled]="!createAccountForm.valid">Create Account</button>
-      <div class="errorText" *ngIf="!createAccountForm.valid">Not ready</div>
+      <button type="submit" class="btn btn-dark" [disabled]="!forms.createAccountForm.valid">Create Account</button>
+      <div class="errorText" *ngIf="!forms.createAccountForm.valid">Not ready</div>
       <button (click)="goToMenu()" class="btn btn-dark">Cancel</button>
       <div class="errorText" *ngIf="loginState == LoginStates.Failed">Failed to create account. Username may already exist.</div>
     </form>
