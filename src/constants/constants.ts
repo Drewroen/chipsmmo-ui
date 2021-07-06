@@ -146,6 +146,5 @@ export class Constants {
     public static readonly GAME_STATUS_PLAYING = 1;
     public static readonly GAME_STATUS_FINISHED = 2;
 
-    public static readonly GAME_FPS = 60;
     public static readonly GAMEPLAY_TIMER = 60 * 3;
   }
