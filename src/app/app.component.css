@@ -1,4 +1,4 @@
-#gameArea {
+#game-area {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -11,79 +11,104 @@
   border: 1px solid black;
 }
 
-#chat {
-  background: greenyellow;
-  width: 160px;
-}
-
-#startInput, #waitingMessage, #loadingMessage, #respawnMessage, #loginInput, #lobbiesInput, #createAccountInput {
+.white-panel {
   background: white;
   padding: 10px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   z-index: 40;
-  width: 240px;
   border: 2px solid gray;
   border-radius: 5px;
-  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
+}
+
+.medium-panel {
+  width: 240px;
+}
+
+.wide-panel {
+  width: 360px;
 }
 
 #waitingMessage {
   font-size: 14px;
 }
 
-#startInput button, #loginInput button, #lobbiesInput button, #createAccountInput button {
+.menu-button {
   color: #fff !important;
-  text-transform: uppercase;
   text-decoration: none;
-  background: #0b9b74;
-  padding: 5px 20px;
-  border-radius: 5px;
   display: inline-block;
-  border: none;
-  width: 80%;
-  margin: 2px 5px 10px 5px;
+  background-color: #54c800;
+  border-color: #54c800;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font: 400 13.3333px Arial;
+  font-weight: 700;
+  border-radius: 5px;
+  font-size: 20px;
+  height: 34px;
+  margin: 2px;
+  cursor: pointer;
 }
 
-#startInput button:hover, #loginInput button:hover, #lobbiesInput button:hover, #createAccountInput button:hover {
-  background: #07684e;
+.menu-title {
+  font-size: 40px;
+  font-weight: bold;
+  margin: 12px;
 }
 
-#startInput button:disabled, #loginInput button:disabled, #lobbiesInput button:disabled, #createAccountInput button:disabled {
+.button-half {
+  width: 108px;
+}
+
+.button-full {
+  width: 220px;
+}
+
+#main-panel button:hover {
+  background: #347F01;
+}
+
+#main-panel button:disabled {
   background: gray;
 }
 
-#startInput input, #loginInput input, #createAccountInput input {
+#main-panel input {
   width: 80%;
   margin: 2px 5px 10px 5px;
   border-radius: 5px;
 }
 
-.errorText {
-  text-align: center;
+.default-font {
+  font-family: Arial, Helvetica, sans-serif;
+  color: black;
+}
+
+.error-font {
   font-family: Arial, Helvetica, sans-serif;
   color: red;
-  font-size: 12px;
+}
+
+.default-margin {
   margin: 4px;
 }
 
-.subText {
+.text-centered {
   text-align: center;
-  font-family: Arial, Helvetica, sans-serif;
-  color: black;
-  font-size: 12px;
-  margin: 4px;
 }
 
-.titleText {
-  text-align: center;
-  font-family: Arial, Helvetica, sans-serif;
-  color: black;
+.text-sm {
+  font-size: 12px;
+}
+
+.text-md {
   font-size: 16px;
-  margin: 4px;
+}
+
+.text-l {
+  font-size: 24px;
+}
+
+.text-xl {
+  font-size: 32px;
 }
 
 a {
@@ -91,6 +116,20 @@ a {
   cursor: pointer;
 }
 
-.currentRoom {
+.current-room-text {
   background: #054232 !important;
+}
+
+.centered-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.centered-footer-panel {
+  position: absolute;
+  bottom: 0%;
+  left: 50%;
+  transform: translate(-50%, 0);
 }

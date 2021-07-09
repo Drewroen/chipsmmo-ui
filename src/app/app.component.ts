@@ -529,4 +529,25 @@ export class AppComponent implements OnInit {
       }
     });
   }
+
+  centerPanelShouldShow(): boolean {
+    return this.menuState === MenuState.Menu ||
+      this.menuState === MenuState.CreateAccount ||
+      this.menuState === MenuState.Loading ||
+      this.menuState === MenuState.Lobbies ||
+      this.menuState === MenuState.Login ||
+      this.menuState === MenuState.Respawning ||
+      (this.menuState === MenuState.Playing && this.gameState === GameState.Starting);
+  }
+
+  centerFooterPanelShouldShow(): boolean {
+    return this.menuState === MenuState.Menu ||
+      this.menuState === MenuState.CreateAccount ||
+      this.menuState === MenuState.Lobbies ||
+      this.menuState === MenuState.Login;
+  }
+
+  isPlaying(): boolean {
+    return this.menuState === MenuState.Playing || this.menuState === MenuState.Respawning;
+  }
 }

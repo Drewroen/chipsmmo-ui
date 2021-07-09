@@ -29,6 +29,7 @@ const config: SocketIoConfig = {
     SocketIoModule.forRoot(config),
     ReactiveFormsModule,
     HttpClientModule
+    // MatIconModule
   ],
   providers: [
     SocketIOService,
