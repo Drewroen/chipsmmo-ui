@@ -7,21 +7,6 @@ import { InformationGraphics } from './informationGraphics';
 import { MapGraphics } from './mapGraphics';
 import { ResultGraphics } from './resultGraphics';
 
-declare var PIXI: any;
-
-const inventoryTextureList: Map<number, any> = new Map([
-  [Constants.OBJECT_BLUE_KEY, PIXI.Texture.from('./../assets/CC_TILE_65_BLUE_KEY.png')],
-  [Constants.OBJECT_RED_KEY, PIXI.Texture.from('./../assets/CC_TILE_66_RED_KEY.png')],
-  [Constants.OBJECT_GREEN_KEY, PIXI.Texture.from('./../assets/CC_TILE_67_GREEN_KEY.png')],
-  [Constants.OBJECT_YELLOW_KEY, PIXI.Texture.from('./../assets/CC_TILE_68_YELLOW_KEY.png')],
-  [Constants.OBJECT_FIRE_BOOTS, PIXI.Texture.from('./../assets/CC_TILE_74_FIRE_BOOTS.png')],
-  [Constants.OBJECT_FLIPPERS, PIXI.Texture.from('./../assets/CC_TILE_73_FLIPPERS.png')],
-  [Constants.OBJECT_ICE_SKATES, PIXI.Texture.from('./../assets/CC_TILE_75_ICE_SKATES.png')],
-  [Constants.OBJECT_SUCTION_BOOTS, PIXI.Texture.from('./../assets/CC_TILE_76_SUCTION_BOOTS.png')],
-  [Constants.OBJECT_BOWLING_BALL, PIXI.Texture.from('./../assets/CC_TILE_91_BOWLING_BALL.png')],
-  [Constants.OBJECT_WHISTLE, PIXI.Texture.from('./../assets/CC_TILE_95_WHISTLE.png')]
-]);
-
 export class Graphics {
   public map: MapGraphics;
   public information: InformationGraphics;
@@ -65,7 +50,7 @@ export class Graphics {
   }
 
   private setInventoryTile(x: number, y: number, value: number) {
-    this.information.inventory[x][y].texture = value ? inventoryTextureList.get(value) : null;
+    this.information.inventory[x][y].texture = value ? GraphicConstants.inventory.get(value) : null;
   }
 
   public setTime(time: number) {
