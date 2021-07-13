@@ -1,0 +1,6 @@
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+.mat-tooltip.tooltip {
+  font-size: 12px;
+  width: 160px;
+}

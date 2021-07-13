@@ -138,7 +138,7 @@ export class Graphics {
     const currentPlayerPosition = players
       .map(function (player) { return player.id; })
       .indexOf(socketId);
-    this.results.player.text = (currentPlayerPosition + 1) + '. ' + currentPlayer.name;
+    this.results.player.text = currentPlayer ? (currentPlayerPosition + 1) + '. ' + currentPlayer.name : '';
 
     for (var i = 0; i < 8; i++) {
       if (players[i]) {

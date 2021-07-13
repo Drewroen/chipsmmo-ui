@@ -21,15 +21,15 @@
 }
 
 .medium-panel {
-  width: 240px;
+  width: 280px;
 }
 
 .wide-panel {
   width: 360px;
 }
 
-#waitingMessage {
-  font-size: 14px;
+#main-menu {
+  padding-bottom: 16px;
 }
 
 .menu-button {
@@ -41,26 +41,79 @@
   border: 1px solid transparent;
   border-radius: 4px;
   font: 400 13.3333px Arial;
-  font-weight: 700;
   border-radius: 5px;
   font-size: 20px;
   height: 34px;
   margin: 2px;
   cursor: pointer;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.menu-settings-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: gray;
+  cursor: pointer;
 }
 
 .menu-title {
   font-size: 40px;
-  font-weight: bold;
+  font-weight: 600;
   margin: 12px;
+  margin-top: 24px;
 }
 
-.button-half {
-  width: 108px;
+.menu-name-input {
+  width: 260px;
+  margin: 0 auto;
+  padding-bottom: 8px;
+}
+
+.name-input-wrapper {
+  height: 24px;
+  width: 200px;
+  vertical-align: baseline;
+  display: inline-block;
+  margin: 4px 4px 20px 4px;
+}
+
+.name-input {
+  height: 24px;
+  width: 180px;
+  border-radius: 4px;
+  border-style: solid;
+  border-color: #A2A2A2;
+  padding-left: 10px;
+}
+
+.login-input {
+  height: 24px;
+  width: 80%;
+  border-radius: 4px;
+  border-style: solid;
+  border-color: #A2A2A2;
+  padding-left: 10px;
+  margin: 2px;
+}
+
+.name-image {
+  height: 36px;
+  vertical-align: middle;
+  border: 2px solid #A2A2A2;
+  padding: 4px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
 .button-full {
   width: 220px;
+}
+
+.button-half {
+  width: 108px;
+  font-size: 15px;
 }
 
 #main-panel button:hover {
@@ -69,12 +122,6 @@
 
 #main-panel button:disabled {
   background: gray;
-}
-
-#main-panel input {
-  width: 80%;
-  margin: 2px 5px 10px 5px;
-  border-radius: 5px;
 }
 
 .default-font {
@@ -117,7 +164,7 @@ a {
 }
 
 .current-room-text {
-  background: #054232 !important;
+  background: #347F01 !important;
 }
 
 .centered-panel {
@@ -132,4 +179,100 @@ a {
   bottom: 0%;
   left: 50%;
   transform: translate(-50%, 0);
+}
+
+.lobbies-input {
+  width: 100%;
+}
+
+.lobbies-button {
+  color: #fff !important;
+  text-decoration: none;
+  display: inline-block;
+  background-color: #54c800;
+  border: none;
+  height: 48px;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin: 1px;
+}
+
+.lobbies-button-left-side {
+  width: 80%;
+  float: left;
+  text-align: left;
+}
+
+.lobbies-button-right-side {
+  width: 20%;
+  float: right;
+}
+
+.lobbies-button-room-name {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.lobbies-button-room-type {
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.lobbies-button-room-count {
+  font-size: 14px;
+}
+
+.lobbies-button-back {
+  text-align: center;
+  width: 100%;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.settings-menu {
+
+}
+
+.settings-header-1 {
+  text-align: left;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  margin-left: 4px;
+}
+
+.settings-header-2 {
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  margin-left: 4px;
+}
+
+.settings-controls {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.settings-controls-action {
+  width: 55%;
+  float: left;
+  text-align: left;
+  font-size: 14px;
+}
+
+.settings-controls-key {
+  width: 35%;
+  float: right;
+  font-size: 14px;
+}
+
+.current-key-being-updated {
+  background: #347F01 !important;
 }
