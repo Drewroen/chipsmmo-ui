@@ -13,6 +13,7 @@ import { Graphics } from 'src/objects/graphics/graphics';
 import { GameInformation } from 'src/objects/gameInformation';
 import { MapInformation } from 'src/objects/mapInformation';
 import { GameState, LoginState, MenuState } from 'src/constants/states';
+import { UserSettings } from 'src/objects/userSettings';
 
 export declare var PIXI: any;
 
@@ -24,6 +25,8 @@ export declare var PIXI: any;
 export class AppComponent implements OnInit {
 
   public userInfo: UserInfo;
+
+  public userSettings: UserSettings;
 
   public forms: Forms = new Forms();
   public graphics: Graphics = new Graphics();
@@ -60,42 +63,54 @@ export class AppComponent implements OnInit {
   public LoginStates = LoginState;
   public GameStates = GameState;
 
+  public waitingForKey: string;
+
   public eloResults: EloResult[];
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
     if (event.type === 'keyup') {
-      if (event.key === Constants.DEFAULT_KEY_UP_ARROW)
-        this.movementService.sendKeyUp(Constants.DIRECTION_UP);
-      else if (event.key === Constants.DEFAULT_KEY_DOWN_ARROW)
-        this.movementService.sendKeyUp(Constants.DIRECTION_DOWN);
-      else if (event.key === Constants.DEFAULT_KEY_RIGHT_ARROW)
-        this.movementService.sendKeyUp(Constants.DIRECTION_RIGHT);
-      else if (event.key === Constants.DEFAULT_KEY_LEFT_ARROW)
-        this.movementService.sendKeyUp(Constants.DIRECTION_LEFT);
+      if (this.menuState === MenuState.Playing)
+      {
+        if (event.key === this.userSettings.controls.up)
+          this.movementService.sendKeyUp(Constants.DIRECTION_UP);
+        else if (event.key === this.userSettings.controls.down)
+          this.movementService.sendKeyUp(Constants.DIRECTION_DOWN);
+        else if (event.key === this.userSettings.controls.right)
+          this.movementService.sendKeyUp(Constants.DIRECTION_RIGHT);
+        else if (event.key === this.userSettings.controls.left)
+          this.movementService.sendKeyUp(Constants.DIRECTION_LEFT);
+      }
     }
     else if (event.type === 'keydown') {
-      if (event.key === Constants.DEFAULT_KEY_UP_ARROW)
-        this.movementService.sendKeyDown(Constants.DIRECTION_UP);
-      else if (event.key === Constants.DEFAULT_KEY_DOWN_ARROW)
-        this.movementService.sendKeyDown(Constants.DIRECTION_DOWN);
-      else if (event.key === Constants.DEFAULT_KEY_RIGHT_ARROW)
-        this.movementService.sendKeyDown(Constants.DIRECTION_RIGHT);
-      else if (event.key === Constants.DEFAULT_KEY_LEFT_ARROW)
-        this.movementService.sendKeyDown(Constants.DIRECTION_LEFT);
-      else if (event.key === Constants.DEFAULT_KEY_THROW_BOWLING_BALL)
-        this.movementService.sendKeyDown(Constants.THROW_BOWLING_BALL);
-      else if (event.key === Constants.DEFAULT_KEY_CALL_WHISTLE)
-        this.movementService.sendKeyDown(Constants.CALL_WHISTLE)
-      else if (event.key === Constants.DEFAULT_KEY_ENTER) {
+      if (this.waitingForKey)
+      {
+        this.setControl(this.waitingForKey, event.key);
+        localStorage.setItem('user_settings', JSON.stringify(this.userSettings));
+        this.waitingForKey = null;
+      }
+      if (this.menuState === MenuState.Playing)
+      {
+        if (event.key === this.userSettings.controls.up)
+          this.movementService.sendKeyDown(Constants.DIRECTION_UP);
+        else if (event.key === this.userSettings.controls.down)
+          this.movementService.sendKeyDown(Constants.DIRECTION_DOWN);
+        else if (event.key === this.userSettings.controls.right)
+          this.movementService.sendKeyDown(Constants.DIRECTION_RIGHT);
+        else if (event.key === this.userSettings.controls.left)
+          this.movementService.sendKeyDown(Constants.DIRECTION_LEFT);
+        else if (event.key === this.userSettings.controls.throwBowlingBall)
+          this.movementService.sendKeyDown(Constants.THROW_BOWLING_BALL);
+        else if (event.key === this.userSettings.controls.callWhistle)
+          this.movementService.sendKeyDown(Constants.CALL_WHISTLE);
+      }
+      if (event.key === Constants.DEFAULT_KEY_ENTER) {
         switch (this.menuState) {
           case MenuState.Login: this.logIntoAccount(); break;
           case MenuState.Menu: this.playGame(); break;
           case MenuState.CreateAccount: this.createAccount(); break;
-          case MenuState.Lobbies:
-          case MenuState.Playing:
-          case MenuState.Loading: break;
+          default: break;
         }
       }
     }
@@ -134,6 +149,11 @@ export class AppComponent implements OnInit {
       this.menuState = MenuState.Menu;
       this.userInfo = null;
     }
+
+    this.userSettings = localStorage.getItem('user_settings') ? JSON.parse(localStorage.getItem('user_settings')) as UserSettings : new UserSettings();
+    localStorage.setItem('user_settings', JSON.stringify(this.userSettings));
+
+    this.waitingForKey = null;
 
     document.getElementById('map').appendChild(this.app.view);
 
@@ -380,8 +400,17 @@ export class AppComponent implements OnInit {
     this.menuState = MenuState.Lobbies;
   }
 
+  goToSettings(): void {
+    this.menuState = MenuState.Settings;
+  }
+
   goToCreateAccount(): void {
-    this.menuState = MenuState.CreateAccount;
+    if(this.loginState == LoginState.LoggedOut)
+      this.menuState = MenuState.CreateAccount;
+  }
+
+  waitForKey(key: string): void {
+    this.waitingForKey = key;
   }
 
   logout(): void {
@@ -528,5 +557,62 @@ export class AppComponent implements OnInit {
           this.mapInformation.terrain[x][y] = parseInt(newTile);
       }
     });
+  }
+
+  centerPanelShouldShow(): boolean {
+    return this.menuState === MenuState.Menu ||
+      this.menuState === MenuState.CreateAccount ||
+      this.menuState === MenuState.Loading ||
+      this.menuState === MenuState.Lobbies ||
+      this.menuState === MenuState.Login ||
+      this.menuState === MenuState.Respawning ||
+      this.menuState === MenuState.Settings ||
+      (this.menuState === MenuState.Playing && this.gameState === GameState.Starting);
+  }
+
+  centerFooterPanelShouldShow(): boolean {
+    return this.menuState === MenuState.Menu ||
+      this.menuState === MenuState.CreateAccount ||
+      this.menuState === MenuState.Lobbies ||
+      this.menuState === MenuState.Settings ||
+      this.menuState === MenuState.Login;
+  }
+
+  isPlaying(): boolean {
+    return this.menuState === MenuState.Playing || this.menuState === MenuState.Respawning;
+  }
+
+  getUserName(): string {
+    return this.userInfo?.username ? this.userInfo.username : 'Chip';
+  }
+
+  setControl(key: string, value: string) {
+    const currentControls = this.userSettings.controls;
+    if (value !== currentControls.up &&
+      value !== currentControls.down &&
+      value !== currentControls.left &&
+      value !== currentControls.right &&
+      value !== currentControls.throwBowlingBall &&
+      value !== currentControls.callWhistle)
+    {
+      switch(key)
+      {
+        case 'Up': this.userSettings.controls.up = value; break;
+        case 'Down': this.userSettings.controls.down = value; break;
+        case 'Left': this.userSettings.controls.left = value; break;
+        case 'Right': this.userSettings.controls.right = value; break;
+        case 'Throw Bowling Ball': this.userSettings.controls.throwBowlingBall = value; break;
+        case 'Call Whistle': this.userSettings.controls.callWhistle = value; break;
+      }
+    }
+  }
+
+  resetDefaultControls() {
+    this.userSettings = new UserSettings();
+    localStorage.setItem('user_settings', JSON.stringify(this.userSettings));
+  }
+
+  thisKeyIsActive(key): boolean {
+    return key === this.waitingForKey;
   }
 }

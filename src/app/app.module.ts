@@ -5,12 +5,15 @@ import { environment } from './../environments/environment';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
+import { MatIconModule } from '@angular/material/icon';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 const config: SocketIoConfig = {
   url: environment.socketUrl,
@@ -28,7 +31,10 @@ const config: SocketIoConfig = {
     AppRoutingModule,
     SocketIoModule.forRoot(config),
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    MatIconModule,
+    BrowserAnimationsModule,
+    MatTooltipModule
   ],
   providers: [
     SocketIOService,

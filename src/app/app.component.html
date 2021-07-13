@@ -1,62 +1,138 @@
-<!-- <router-outlet></router-outlet> -->
-
-<div id="gameArea">
+<div id="game-area">
   <div id="map">
-    <div id="startInput" *ngIf="menuState === MenuStates.Menu">
-      <div class="container">
-        <div *ngIf="loginState == LoginStates.LoggedIn">
-          <div class="titleText">Welcome back, {{userInfo?.username}}</div>
-          <div class="subText" *ngIf="!userInfo?.verified">Verify your account now to chat ingame!</div>
+    <div id="main-panel" class="centered-panel white-panel medium-panel" *ngIf="centerPanelShouldShow()">
+      <div id="main-menu" *ngIf="menuState === MenuStates.Menu">
+        <div class="menu-settings-button" (click)="goToSettings()">
+          <mat-icon>settings</mat-icon>
         </div>
-        <div *ngIf="loginState !== LoginStates.LoggedIn">
-          <div class="titleText">Hi, Chip!</div>
-          <div class="subText">Create an account to pick your own username.</div>
+        <div class="default-font menu-title">ChipsMMO</div>
+        <div class="menu-name-input">
+          <img class="name-image" src="assets/CC_TILE_1_CHIP.png">
+          <div class="name-input-wrapper" matTooltipClass="tooltip" matTooltip="You cannot pick a custom name (yet). Login to choose a username.">
+            <input placeholder="Pick a name" [value]="getUserName()" disabled class="name-input">
+          </div>
         </div>
-        <div class="errorText"><strong>NOTE: This site is in early development! Do not expect account info to stick around!</strong></div>
-        <div class="errorText">The good news? Making an account takes about 5 seconds.</div>
-        <button (click)="playGame()" class="btn btn-dark">Play</button>
-        <button (click)="goToLogin()" *ngIf="loginState !== LoginStates.LoggedIn" class="btn btn-dark">Login/Create</button>
-        <button (click)="logout()" *ngIf="loginState == LoginStates.LoggedIn" class="btn btn-dark">Log Out</button>
-        <button (click)="goToLobbies()" class="btn btn-dark">Lobbies</button>
+        <button (click)="playGame()" class="menu-button button-full">Play</button>
+        <button (click)="goToLogin()" *ngIf="loginState !== LoginStates.LoggedIn" class="menu-button button-half">Log In</button>
+        <button (click)="logout()" *ngIf="loginState == LoginStates.LoggedIn" class="menu-button button-half">Log Out</button>
+        <button (click)="goToLobbies()" class="menu-button button-half">Lobbies</button>
       </div>
-    </div>
-    <form id="loginInput" *ngIf="menuState === MenuStates.Login" [formGroup]="forms.loginForm" (ngSubmit)="logIntoAccount()">
-      <input formControlName="username" type="text" placeholder="Username">
-      <input formControlName="password" type="password" placeholder="Password">
-      <button type="submit" class="btn btn-dark" [disabled]="!forms.loginForm.valid">Login</button>
-      <button (click)="goToMenu()" class="btn btn-dark">Cancel</button>
-      <div class="subText"><a (click)="goToCreateAccount()">Create an account</a> to pick your own username.</div>
-      <div class="errorText" *ngIf="loginState == LoginStates.Failed">Failed to login.</div>
-    </form>
-    <div id="waitingMessage" *ngIf="menuState === MenuStates.Playing && gameState === GameStates.Starting">
-      <div *ngIf="gameState === GameStates.Starting">
+      <div id="login-menu" *ngIf="menuState === MenuStates.Login">
+        <form [formGroup]="forms.loginForm" (ngSubmit)="logIntoAccount()">
+          <input formControlName="username" type="text" placeholder="Username" class="login-input">
+          <input formControlName="password" type="password" placeholder="Password" class="login-input">
+          <button type="submit" [disabled]="!forms.loginForm.valid" class="menu-button button-half">Login</button>
+          <button (click)="goToMenu()" class="menu-button button-half">Cancel</button>
+          <div class="default-font default-margin text-sm"><a (click)="goToCreateAccount()">Create an account</a> to pick your own username.</div>
+          <div class="error-font default-margin text-sm" *ngIf="loginState == LoginStates.Failed">Failed to login.</div>
+        </form>
+      </div>
+      <div id="lobbies-input" *ngIf="menuState === MenuStates.Lobbies">
+        <div *ngFor="let room of rooms">
+          <button (click)="joinRoom(room.name)" class="lobbies-button" [disabled]="room.playerCount >= room.maxPlayerCount" [ngClass]="{'current-room-text': currentRoom.name === room.name}">
+            <div class="lobbies-button-left-side">
+              <div class="lobbies-button-room-name">
+                {{room.name}}
+              </div>
+              <div class="lobbies-button-room-type">
+                {{room.type === 1 ? 'Competitive' : 'Casual'}}
+              </div>
+            </div>
+            <div class="lobbies-button-right-side">
+              <div class="lobbies-button-room-count">
+                {{room.playerCount}}/{{room.maxPlayerCount}}
+              </div>
+            </div>
+          </button>
+        </div>
+        <button (click)="goToMenu()" class="lobbies-button">
+          <div class="lobbies-button-back">
+            Back
+          </div>
+        </button>
+      </div>
+      <div class="create-account-menu" *ngIf="menuState === MenuStates.CreateAccount">
+        <form [formGroup]="forms.createAccountForm" (ngSubmit)="createAccount()">
+          <input formControlName="username" type="text" placeholder="Username" class="login-input">
+          <input formControlName="password" type="password" placeholder="Password" class="login-input">
+          <input formControlName="confirmPassword" type="password" placeholder="Confirm Password" class="login-input">
+          <input formControlName="email" type="text" placeholder="Email (Optional)" class="login-input">
+          <button type="submit" [disabled]="!forms.createAccountForm.valid" class="menu-button button-half">Create</button>
+          <button (click)="goToMenu()" class="menu-button button-half">Cancel</button>
+          <div class="error-font" *ngIf="loginState == LoginStates.Failed">Failed to create account. Username may already exist.</div>
+        </form>
+      </div>
+      <div class="default-font default-margin text-md" *ngIf="menuState === MenuStates.Playing && gameState === GameStates.Starting">
         Starting in {{ gameInformation.time }} seconds...
       </div>
-    </div>
-    <div id="loadingMessage" *ngIf="menuState === MenuStates.Loading">
-      Loading...
-    </div>
-    <div id="respawnMessage" *ngIf="menuState === MenuStates.Respawning && gameState === GameStates.Playing">
-      Respawning soon...
-    </div>
-    <div id="lobbiesInput" *ngIf="menuState === MenuStates.Lobbies">
-      <div *ngFor="let room of rooms">
-        <button (click)="joinRoom(room.name)" class="btn btn-dark" [disabled]="room.playerCount >= room.maxPlayerCount" [ngClass]="{'currentRoom': currentRoom.name === room.name}">{{room.name}} - {{room.playerCount}}/{{room.maxPlayerCount}} ({{room.type === 1 ? 'Competitive' : 'Casual'}})</button>
+      <div class="default-font default-margin text-md" *ngIf="menuState === MenuStates.Loading">
+        Loading...
       </div>
-      <button (click)="goToMenu()" class="btn btn-dark">Back</button>
+      <div class="default-font default-margin text-md" *ngIf="menuState === MenuStates.Respawning && gameState === GameStates.Playing">
+        Respawning soon...
+      </div>
+      <div id="settings-menu" *ngIf="menuState === MenuStates.Settings">
+        <div class="settings-header-1">
+          Settings
+        </div>
+        <div class="settings-header-2">
+          Controls
+        </div>
+        <div class="settings-controls">
+          <div class="settings-controls-action">
+            Move Up
+          </div>
+          <button (click)="waitForKey('Up')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Up')}">
+            {{ userSettings.controls.up }}
+          </button>
+        </div>
+        <div class="settings-controls">
+          <div class="settings-controls-action">
+            Move Down
+          </div>
+          <button (click)="waitForKey('Down')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Down')}">
+            {{ userSettings.controls.down }}
+          </button>
+        </div>
+        <div class="settings-controls">
+          <div class="settings-controls-action">
+            Move Left
+          </div>
+          <button (click)="waitForKey('Left')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Left')}">
+            {{ userSettings.controls.left }}
+          </button>
+        </div>
+        <div class="settings-controls">
+          <div class="settings-controls-action">
+            Move Right
+          </div>
+          <button (click)="waitForKey('Right')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Right')}">
+            {{ userSettings.controls.right }}
+          </button>
+        </div>
+        <div class="settings-controls">
+          <div class="settings-controls-action">
+            Throw Bowling Ball
+          </div>
+          <button (click)="waitForKey('Throw Bowling Ball')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Throw Bowling Ball')}">
+            {{ userSettings.controls.throwBowlingBall }}
+          </button>
+        </div>
+        <div class="settings-controls">
+          <div class="settings-controls-action">
+            Call Whistle
+          </div>
+          <button (click)="waitForKey('Call Whistle')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Call Whistle')}">
+            {{ userSettings.controls.callWhistle }}
+          </button>
+        </div>
+        <button (click)="goToMenu()" class="menu-button button-half">Back</button>
+        <button (click)="resetDefaultControls()" class="menu-button button-half">Reset</button>
+      </div>
     </div>
-    <form id="loginInput" *ngIf="menuState === MenuStates.CreateAccount" [formGroup]="forms.createAccountForm" (ngSubmit)="createAccount()">
-      <input formControlName="username" type="text" placeholder="Username">
-      <input formControlName="password" type="password" placeholder="Password">
-      <input formControlName="confirmPassword" type="password" placeholder="Confirm Password">
-      <input formControlName="email" type="text" placeholder="Email (Optional)">
-      <button type="submit" class="btn btn-dark" [disabled]="!forms.createAccountForm.valid">Create Account</button>
-      <div class="errorText" *ngIf="!forms.createAccountForm.valid">Not ready</div>
-      <button (click)="goToMenu()" class="btn btn-dark">Cancel</button>
-      <div class="errorText" *ngIf="loginState == LoginStates.Failed">Failed to create account. Username may already exist.</div>
-    </form>
+    <div id="footer-panel" class="centered-footer-panel white-panel wide-panel" *ngIf="centerFooterPanelShouldShow()">
+      <div class="error-font default-margin text-sm"><strong>NOTE: This site is in early development! Do not expect account info to stick around!</strong></div>
+      <div class="error-font default-margin text-sm">The good news? <a (click)="goToCreateAccount()">Creating an account</a> takes about 5 seconds.</div>
+    </div>
   </div>
-  <!-- <div id="chat">
-    Chat on the way!
-  </div> -->
 </div>
