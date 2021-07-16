@@ -1,5 +1,8 @@
+import { Injectable } from '@angular/core';
+
 declare var PIXI: any;
 
+@Injectable()
 export class ResultGraphics {
   public panel: any;
   public topPlayers: any[];

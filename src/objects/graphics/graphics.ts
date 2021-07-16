@@ -1,3 +1,4 @@
+import { Injectable } from '@angular/core';
 import { Constants } from 'src/constants/constants';
 import { GraphicConstants } from 'src/constants/graphicConstants';
 import { EloResult } from '../eloResult';
@@ -7,17 +8,18 @@ import { InformationGraphics } from './informationGraphics';
 import { MapGraphics } from './mapGraphics';
 import { ResultGraphics } from './resultGraphics';
 
+@Injectable()
 export class Graphics {
   public map: MapGraphics;
   public information: InformationGraphics;
   public assets: AssetGraphics;
   public results: ResultGraphics;
 
-  constructor() {
-    this.map = new MapGraphics();
-    this.information = new InformationGraphics();
-    this.assets = new AssetGraphics();
-    this.results = new ResultGraphics();
+  constructor(map: MapGraphics, information: InformationGraphics, assets: AssetGraphics, results: ResultGraphics) {
+    this.map = map;
+    this.information = information;
+    this.assets = assets;
+    this.results = results;
   }
 
   public setTerrainTile(x: number, y: number, value: number) {

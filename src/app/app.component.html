@@ -1,35 +1,35 @@
 <div id="game-area">
   <div id="map">
-    <div id="main-panel" class="centered-panel white-panel medium-panel" *ngIf="centerPanelShouldShow()">
-      <div id="main-menu" *ngIf="menuState === MenuStates.Menu">
-        <div class="menu-settings-button" (click)="goToSettings()">
+    <div id="main-panel" class="centered-panel white-panel medium-panel" *ngIf="appStates.centerPanelShouldShow()">
+      <div id="main-menu" *ngIf="appStates.menuState === MenuStates.Menu">
+        <div class="menu-settings-button" (click)="appStates.goToSettings()">
           <mat-icon>settings</mat-icon>
         </div>
         <div class="default-font menu-title">ChipsMMO</div>
         <div class="menu-name-input">
           <img class="name-image" src="assets/CHIP.png">
           <div class="name-input-wrapper" matTooltipClass="tooltip" matTooltip="You cannot pick a custom name (yet). Login to choose a username.">
-            <input placeholder="Pick a name" [value]="getUserName()" disabled class="name-input">
+            <input placeholder="Pick a name" [value]="userInfo.getUserName()" disabled class="name-input">
           </div>
         </div>
-        <button (click)="playGame()" class="menu-button button-full">Play</button>
-        <button (click)="goToLogin()" *ngIf="loginState !== LoginStates.LoggedIn" class="menu-button button-half">Log In</button>
-        <button (click)="logout()" *ngIf="loginState == LoginStates.LoggedIn" class="menu-button button-half">Log Out</button>
-        <button (click)="goToLobbies()" class="menu-button button-half">Lobbies</button>
+        <button (click)="appStates.playGame()" class="menu-button button-full">Play</button>
+        <button (click)="appStates.goToLogin()" *ngIf="appStates.loginState !== LoginStates.LoggedIn" class="menu-button button-half">Log In</button>
+        <button (click)="loginService.logout()" *ngIf="appStates.loginState == LoginStates.LoggedIn" class="menu-button button-half">Log Out</button>
+        <button (click)="appStates.goToLobbies()" class="menu-button button-half">Lobbies</button>
       </div>
-      <div id="login-menu" *ngIf="menuState === MenuStates.Login">
-        <form [formGroup]="forms.loginForm" (ngSubmit)="logIntoAccount()">
+      <div id="login-menu" *ngIf="appStates.menuState === MenuStates.Login">
+        <form [formGroup]="forms.loginForm" (ngSubmit)="loginService.logIntoAccount()">
           <input formControlName="username" type="text" placeholder="Username" class="login-input">
           <input formControlName="password" type="password" placeholder="Password" class="login-input">
           <button type="submit" [disabled]="!forms.loginForm.valid" class="menu-button button-half">Login</button>
-          <button (click)="goToMenu()" class="menu-button button-half">Cancel</button>
-          <div class="default-font default-margin text-sm"><a (click)="goToCreateAccount()">Create an account</a> to pick your own username.</div>
-          <div class="error-font default-margin text-sm" *ngIf="loginState == LoginStates.Failed">Failed to login.</div>
+          <button (click)="appStates.goToMenu()" class="menu-button button-half">Cancel</button>
+          <div class="default-font default-margin text-sm"><a (click)="appStates.goToCreateAccount()">Create an account</a> to pick your own username.</div>
+          <div class="error-font default-margin text-sm" *ngIf="appStates.loginState == LoginStates.Failed">Failed to login.</div>
         </form>
       </div>
-      <div id="lobbies-input" *ngIf="menuState === MenuStates.Lobbies">
-        <div *ngFor="let room of rooms">
-          <button (click)="joinRoom(room.name)" class="lobbies-button" [disabled]="room.playerCount >= room.maxPlayerCount" [ngClass]="{'current-room-text': currentRoom.name === room.name}">
+      <div id="lobbies-input" *ngIf="appStates.menuState === MenuStates.Lobbies">
+        <div *ngFor="let room of gameInformation.rooms">
+          <button (click)="socketService.joinRoom(room.name)" class="lobbies-button" [disabled]="room.playerCount >= room.maxPlayerCount" [ngClass]="{'current-room-text': gameInformation.currentRoom.name === room.name}">
             <div class="lobbies-button-left-side">
               <div class="lobbies-button-room-name">
                 {{room.name}}
@@ -45,33 +45,33 @@
             </div>
           </button>
         </div>
-        <button (click)="goToMenu()" class="lobbies-button">
+        <button (click)="appStates.goToMenu()" class="lobbies-button">
           <div class="lobbies-button-back">
             Back
           </div>
         </button>
       </div>
-      <div class="create-account-menu" *ngIf="menuState === MenuStates.CreateAccount">
-        <form [formGroup]="forms.createAccountForm" (ngSubmit)="createAccount()">
+      <div class="create-account-menu" *ngIf="appStates.menuState === MenuStates.CreateAccount">
+        <form [formGroup]="forms.createAccountForm" (ngSubmit)="loginService.createAccount()">
           <input formControlName="username" type="text" placeholder="Username" class="login-input">
           <input formControlName="password" type="password" placeholder="Password" class="login-input">
           <input formControlName="confirmPassword" type="password" placeholder="Confirm Password" class="login-input">
           <input formControlName="email" type="text" placeholder="Email (Optional)" class="login-input">
           <button type="submit" [disabled]="!forms.createAccountForm.valid" class="menu-button button-half">Create</button>
-          <button (click)="goToMenu()" class="menu-button button-half">Cancel</button>
-          <div class="error-font" *ngIf="loginState == LoginStates.Failed">Failed to create account. Username may already exist.</div>
+          <button (click)="appStates.goToMenu()" class="menu-button button-half">Cancel</button>
+          <div class="error-font" *ngIf="appStates.loginState == LoginStates.Failed">Failed to create account. Username may already exist.</div>
         </form>
       </div>
-      <div class="default-font default-margin text-md" *ngIf="menuState === MenuStates.Playing && gameState === GameStates.Starting">
+      <div class="default-font default-margin text-md" *ngIf="appStates.menuState === MenuStates.Playing && appStates.gameState === GameStates.Starting">
         Starting in {{ gameInformation.time }} seconds...
       </div>
-      <div class="default-font default-margin text-md" *ngIf="menuState === MenuStates.Loading">
+      <div class="default-font default-margin text-md" *ngIf="appStates.menuState === MenuStates.Loading">
         Loading...
       </div>
-      <div class="default-font default-margin text-md" *ngIf="menuState === MenuStates.Respawning && gameState === GameStates.Playing">
+      <div class="default-font default-margin text-md" *ngIf="appStates.menuState === MenuStates.Respawning && appStates.gameState === GameStates.Playing">
         Respawning soon...
       </div>
-      <div id="settings-menu" *ngIf="menuState === MenuStates.Settings">
+      <div id="settings-menu" *ngIf="appStates.menuState === MenuStates.Settings">
         <div class="settings-header-1">
           Settings
         </div>
@@ -82,7 +82,7 @@
           <div class="settings-controls-action">
             Move Up
           </div>
-          <button (click)="waitForKey('Up')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Up')}">
+          <button (click)="userSettings.setCurrentKeyBeingSet('Up')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': userSettings.thisKeyIsActive('Up')}">
             {{ userSettings.controls.up }}
           </button>
         </div>
@@ -90,7 +90,7 @@
           <div class="settings-controls-action">
             Move Down
           </div>
-          <button (click)="waitForKey('Down')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Down')}">
+          <button (click)="userSettings.setCurrentKeyBeingSet('Down')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': userSettings.thisKeyIsActive('Down')}">
             {{ userSettings.controls.down }}
           </button>
         </div>
@@ -98,7 +98,7 @@
           <div class="settings-controls-action">
             Move Left
           </div>
-          <button (click)="waitForKey('Left')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Left')}">
+          <button (click)="userSettings.setCurrentKeyBeingSet('Left')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': userSettings.thisKeyIsActive('Left')}">
             {{ userSettings.controls.left }}
           </button>
         </div>
@@ -106,7 +106,7 @@
           <div class="settings-controls-action">
             Move Right
           </div>
-          <button (click)="waitForKey('Right')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Right')}">
+          <button (click)="userSettings.setCurrentKeyBeingSet('Right')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': userSettings.thisKeyIsActive('Right')}">
             {{ userSettings.controls.right }}
           </button>
         </div>
@@ -114,7 +114,7 @@
           <div class="settings-controls-action">
             Throw Bowling Ball
           </div>
-          <button (click)="waitForKey('Throw Bowling Ball')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Throw Bowling Ball')}">
+          <button (click)="userSettings.setCurrentKeyBeingSet('Throw Bowling Ball')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': userSettings.thisKeyIsActive('Throw Bowling Ball')}">
             {{ userSettings.controls.throwBowlingBall }}
           </button>
         </div>
@@ -122,17 +122,17 @@
           <div class="settings-controls-action">
             Call Whistle
           </div>
-          <button (click)="waitForKey('Call Whistle')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': thisKeyIsActive('Call Whistle')}">
+          <button (click)="userSettings.setCurrentKeyBeingSet('Call Whistle')" class="settings-controls-key" [ngClass]="{'current-key-being-updated': userSettings.thisKeyIsActive('Call Whistle')}">
             {{ userSettings.controls.callWhistle }}
           </button>
         </div>
-        <button (click)="goToMenu()" class="menu-button button-half">Back</button>
-        <button (click)="resetDefaultControls()" class="menu-button button-half">Reset</button>
+        <button (click)="appStates.goToMenu()" class="menu-button button-half">Back</button>
+        <button (click)="userSettings.resetDefaultControls()" class="menu-button button-half">Reset</button>
       </div>
     </div>
-    <div id="footer-panel" class="centered-footer-panel white-panel wide-panel" *ngIf="centerFooterPanelShouldShow()">
+    <div id="footer-panel" class="centered-footer-panel white-panel wide-panel" *ngIf="appStates.centerFooterPanelShouldShow()">
       <div class="error-font default-margin text-sm"><strong>NOTE: This site is in early development! Do not expect account info to stick around!</strong></div>
-      <div class="error-font default-margin text-sm">The good news? <a (click)="goToCreateAccount()">Creating an account</a> takes about 5 seconds.</div>
+      <div class="error-font default-margin text-sm">The good news? <a (click)="appStates.goToCreateAccount()">Creating an account</a> takes about 5 seconds.</div>
     </div>
   </div>
 </div>

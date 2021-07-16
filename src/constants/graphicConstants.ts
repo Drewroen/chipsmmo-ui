@@ -107,7 +107,8 @@ export class GraphicConstants {
     [Constants.MOB_OPPONENT_LEFT_SWIM, GraphicConstants.generateTileTexture(10, 8)],
     [Constants.MOB_BOWLING_BALL, GraphicConstants.generateTileTexture(2, 14)],
     [Constants.MOB_BLOCK_BROKEN, GraphicConstants.generateTileTexture(1, 8)],
-    [Constants.MOB_BLOCK_BROKEN_2, GraphicConstants.generateTileTexture(1, 9)]
+    [Constants.MOB_BLOCK_BROKEN_2, GraphicConstants.generateTileTexture(1, 9)],
+    [Constants.MOB_BLOCK_BROKEN_3, GraphicConstants.generateTileTexture(1, 10)]
   ]);
 
   public static ownership: Map<number, any> = new Map([

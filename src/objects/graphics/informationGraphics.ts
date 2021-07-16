@@ -1,10 +1,10 @@
+import { Injectable } from '@angular/core';
 import { Constants } from 'src/constants/constants';
 import { GraphicConstants } from 'src/constants/graphicConstants';
 
 declare var PIXI: any;
 
-
-
+@Injectable()
 export class InformationGraphics {
   public inventory: any[][];
   public time: any[];

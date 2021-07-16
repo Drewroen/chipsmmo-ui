@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 import * as lz from 'lz-string'
+import { GAME_ROOMS } from 'src/objects/room';
 
 @Injectable()
 export class SocketIOService {
@@ -32,5 +33,10 @@ export class SocketIOService {
 
   getSocketId(): string {
     return this.socket.id;
+  }
+
+  joinRoom(roomName: string): void {
+    const roomNumber = GAME_ROOMS.map(room => room.name).indexOf(roomName);
+    this.sendData(Constants.SOCKET_EVENT_JOIN_ROOM, roomNumber);
   }
 }
