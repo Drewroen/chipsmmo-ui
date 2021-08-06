@@ -99,14 +99,14 @@ export class GameInformation {
 
   updatePlayerInfo(): void {
     const currentPlayer = this.findPlayer();
-    if (!currentPlayer || currentPlayer.quit) {
-      if ([MenuState.Playing, MenuState.Respawning].includes(this.appStates.menuState))
-        this.appStates.menuState = MenuState.Menu;
+    if (currentPlayer && ![MenuState.CreateAccount, MenuState.Loading, MenuState.Lobbies, MenuState.Login, MenuState.Menu, MenuState.Settings].includes(this.appStates.menuState))
+    {
+      if (currentPlayer.alive)
+        this.appStates.menuState = MenuState.Playing;
+      else if (!currentPlayer.alive)
+        this.appStates.menuState = MenuState.Respawning;
     }
-    else if (currentPlayer.alive)
-      this.appStates.menuState = MenuState.Playing;
-    else if (!currentPlayer.alive)
-      this.appStates.menuState = MenuState.Respawning;
+
 
     if (currentPlayer) {
       var inventory = currentPlayer.inventory;

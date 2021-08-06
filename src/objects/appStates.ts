@@ -49,7 +49,7 @@ export class AppStates {
       this.menuState === MenuState.Loading ||
       this.menuState === MenuState.Lobbies ||
       this.menuState === MenuState.Login ||
-      this.menuState === MenuState.Respawning ||
+      (this.menuState === MenuState.Respawning && this.gameState !== GameState.Finished) ||
       this.menuState === MenuState.Settings ||
       (this.menuState === MenuState.Playing && this.gameState === GameState.Starting);
   }

@@ -27,20 +27,26 @@ export class KeyEventService {
         this.movementService.handleKeyUp(event.key);
     }
     else if (event.type === 'keydown') {
-      if (this.userSettings.getCurrentKeyBeingSet())
+      if (event.key === 'Escape')
       {
-        this.setControl(this.userSettings.getCurrentKeyBeingSet(), event.key);
-        localStorage.setItem('user_settings', JSON.stringify(this.userSettings));
-        this.userSettings.setCurrentKeyBeingSet(null);
+        this.appStates.goToMenu();
       }
-      if (this.appStates.menuState === MenuState.Playing)
-        this.movementService.handleKeyDown(event.key);
-      if (event.key === Constants.DEFAULT_KEY_ENTER) {
-        switch (this.appStates.menuState) {
-          case MenuState.Login: this.loginService.logIntoAccount(); break;
-          case MenuState.Menu: this.appStates.playGame(); break;
-          case MenuState.CreateAccount: this.loginService.createAccount(); break;
-          default: break;
+      else {
+        if (this.userSettings.getCurrentKeyBeingSet())
+        {
+          this.setControl(this.userSettings.getCurrentKeyBeingSet(), event.key);
+          localStorage.setItem('user_settings', JSON.stringify(this.userSettings));
+          this.userSettings.setCurrentKeyBeingSet(null);
+        }
+        if (this.appStates.menuState === MenuState.Playing)
+          this.movementService.handleKeyDown(event.key);
+        if (event.key === Constants.DEFAULT_KEY_ENTER) {
+          switch (this.appStates.menuState) {
+            case MenuState.Login: this.loginService.logIntoAccount(); break;
+            case MenuState.Menu: this.appStates.playGame(); break;
+            case MenuState.CreateAccount: this.loginService.createAccount(); break;
+            default: break;
+          }
         }
       }
     }

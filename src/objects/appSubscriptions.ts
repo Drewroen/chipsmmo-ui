@@ -43,11 +43,17 @@ export class AppSubscriptions {
         this.gameInformation.updateMap();
         this.gameInformation.updatePlayerInfo();
         this.gameInformation.updateScoreboard();
+
+        var previousGameState = this.appStates.gameState
         this.gameInformation.updateGameInfo();
         if (this.appStates.gameState == GameState.Finished)
           this.gameInformation.updateEndGameInfo();
         else
+        {
           this.gameInformation.resetEndGameInfo();
+          if (previousGameState === GameState.Finished)
+            this.appStates.goToMenu();
+        }
       }
     });
 

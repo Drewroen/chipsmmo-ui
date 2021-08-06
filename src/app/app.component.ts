@@ -44,7 +44,8 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await this.loginService.loginWithExistingToken();
+    if (localStorage.getItem("refresh_token"))
+      await this.loginService.loginWithExistingToken();
 
     document.getElementById('map').appendChild(this.pixiApp.app.view);
   }

@@ -30,19 +30,21 @@ export class LoginService {
         this.socketService.sendData(Constants.SOCKET_EVENT_LOGIN, newAccessToken.accessToken);
         this.appStates.menuState = MenuState.Menu;
       } catch {
+        this.socketService.sendData(Constants.SOCKET_EVENT_LOGOUT, localStorage.getItem("access_token"));
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
         this.appStates.loginState = LoginState.LoggedOut;
         this.appStates.menuState = MenuState.Menu;
-        this.userInfo.setUserInfo(null);
+        this.userInfo.resetUserInfo();
       }
     }
     else {
+      this.socketService.sendData(Constants.SOCKET_EVENT_LOGOUT, localStorage.getItem("access_token"));
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       this.appStates.loginState = LoginState.LoggedOut;
       this.appStates.menuState = MenuState.Menu;
-      this.userInfo.setUserInfo(null);
+      this.userInfo.resetUserInfo();
     }
   }
 
@@ -50,17 +52,19 @@ export class LoginService {
     this.appStates.menuState = MenuState.Loading;
     try {
       await this.authService.logout();
+      this.socketService.sendData(Constants.SOCKET_EVENT_LOGOUT, localStorage.getItem("access_token"));
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       this.appStates.loginState = LoginState.LoggedOut;
       this.appStates.menuState = MenuState.Menu;
-      this.userInfo.setUserInfo(null);
+      this.userInfo.resetUserInfo();
     } catch {
+      this.socketService.sendData(Constants.SOCKET_EVENT_LOGOUT, localStorage.getItem("access_token"));
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       this.appStates.loginState = LoginState.LoggedOut;
       this.appStates.menuState = MenuState.Menu;
-      this.userInfo.setUserInfo(null);
+      this.userInfo.resetUserInfo();
     };
   }
 
@@ -83,7 +87,7 @@ export class LoginService {
       } catch {
         this.appStates.loginState = LoginState.Failed;
         this.appStates.menuState = MenuState.Login;
-        this.userInfo.setUserInfo(null);
+        this.userInfo.resetUserInfo();
       };
     }
   }
@@ -104,7 +108,7 @@ export class LoginService {
       } catch {
         this.appStates.loginState = LoginState.Failed;
         this.appStates.menuState = MenuState.CreateAccount;
-        this.userInfo.setUserInfo(null);
+        this.userInfo.resetUserInfo();
       }
     }
   }

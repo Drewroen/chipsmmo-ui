@@ -113,7 +113,7 @@ export class GraphicConstants {
 
   public static ownership: Map<number, any> = new Map([
     [Constants.OWNER_GREEN, GraphicConstants.generateTileTexture(12, 15)],
-    [Constants.OWNER_RED, GraphicConstants.generateTileTexture(12, 15)],
+    [Constants.OWNER_RED, GraphicConstants.generateTileTexture(11, 15)],
   ]);
 
   public static inventory: Map<number, any> = new Map([
