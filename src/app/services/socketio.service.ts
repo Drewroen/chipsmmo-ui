@@ -12,8 +12,7 @@ export class SocketIOService {
 
   constructor() {
     this.socket = io(
-      environment.socketUrl,
-      {transports: ['websocket']}
+      environment.socketUrl
     );
   }
 

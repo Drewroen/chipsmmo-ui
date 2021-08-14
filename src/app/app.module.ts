@@ -31,13 +31,6 @@ import { GameInformation } from 'src/objects/gameInformation';
 import { MapInformation } from 'src/objects/mapInformation';
 import { AppSubscriptions } from 'src/objects/appSubscriptions';
 
-const config: SocketIoConfig = {
-  url: environment.socketUrl,
-  // options: {
-  //   transports: ['websocket']
-  // }
-};
-
 @NgModule({
   declarations: [
     AppComponent
@@ -45,7 +38,7 @@ const config: SocketIoConfig = {
   imports: [
     BrowserModule,
     AppRoutingModule,
-    SocketIoModule.forRoot(config),
+    SocketIoModule,
     ReactiveFormsModule,
     HttpClientModule,
     MatIconModule,
