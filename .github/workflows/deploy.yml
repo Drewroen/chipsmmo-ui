@@ -1,15 +1,15 @@
 name: Deploy to Github Pages
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - master
+    branches: [ master ]
 jobs:
   ci:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: 12.x
 
     steps:
       - uses: actions/checkout@v2
@@ -32,16 +32,16 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-            
+
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
           npm ci
-        
+
       - name: Build
         run: |
           ng build --prod --configuration production
-          
+
       - name: Install angular-cli-ghpages
         run: |
           npm install -g angular-cli-ghpages
