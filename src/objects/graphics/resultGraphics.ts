@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-
-declare var PIXI: any;
+import * as PIXI from 'pixi.js'
 
 @Injectable()
 export class ResultGraphics {
@@ -16,7 +15,7 @@ export class ResultGraphics {
     this.topPlayers = [];
 
     for (let i = 0; i < 8; i++) {
-      const playerScoreGraphic = new PIXI.Text('', { font: '60px Arial', fill: 0x000000, fontWeight: 600 });
+      const playerScoreGraphic = new PIXI.Text('', { fontSize: 60, fontFamily: 'Arial', fill: 0x000000, fontWeight: '600' });
       playerScoreGraphic.x = 268;
       playerScoreGraphic.y = 128 + (i * 22);
       playerScoreGraphic.scale.x = .3;
@@ -25,7 +24,7 @@ export class ResultGraphics {
       this.topPlayers.push(playerScoreGraphic);
     }
 
-    const playerGraphic = new PIXI.Text('', { font: '72px Arial', fill: 0x000000, fontWeight: 600 });
+    const playerGraphic = new PIXI.Text('', { fontSize: 72, fontFamily: 'Arial', fill: 0x000000, fontWeight: '600' });
     playerGraphic.x = 268;
     playerGraphic.y = 336;
     playerGraphic.scale.x = .3;

@@ -9,8 +9,7 @@ import { EloResult } from './eloResult';
 import { GameInformation } from './gameInformation';
 import { Graphics } from './graphics/graphics';
 import { Player } from './player';
-
-export declare var PIXI: any;
+import * as PIXI from 'pixi.js'
 
 @Injectable()
 export class AppSubscriptions {

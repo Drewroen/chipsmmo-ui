@@ -12,8 +12,6 @@ import { KeyEventService } from './services/keyEvent.service';
 import { PixiApp } from 'src/objects/pixiApp';
 import { AppSubscriptions } from 'src/objects/appSubscriptions';
 
-export declare var PIXI: any;
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

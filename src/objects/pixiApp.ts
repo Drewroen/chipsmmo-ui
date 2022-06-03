@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Constants } from 'src/constants/constants';
 import { Graphics } from './graphics/graphics';
-
-export declare var PIXI: any;
+import * as PIXI from 'pixi.js'
 
 @Injectable()
 export class PixiApp {
@@ -11,8 +10,11 @@ export class PixiApp {
   constructor(private graphics: Graphics)
   {
     this.app = new PIXI.Application(
-      300 + Constants.INVENTORY_PIXELS + 13, 370,
-      { transparent: true }
+      {
+        transparent: true,
+        height: 370,
+        width: 300 + Constants.INVENTORY_PIXELS + 13
+      }
     );
 
     this.app.stage.addChild(this.graphics.assets.mainPanel);

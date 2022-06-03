@@ -27,7 +27,6 @@
               "src/styles.css"
             ],
             "scripts": [
-              "node_modules/pixi.js/dist/pixi.min.js"
             ]
           },
           "configurations": {
