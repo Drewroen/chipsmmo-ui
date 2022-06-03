@@ -35,17 +35,16 @@ jobs:
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: |
-          npm ci
+        run: npm ci
+
+      - name: Install angular cli
+        run: npm install -g angular/cli
 
       - name: Build
-        run: |
-          ng build --prod --configuration production
+        run: ng build --prod --configuration production
 
       - name: Install angular-cli-ghpages
-        run: |
-          npm install -g angular-cli-ghpages
+        run: npm install -g angular-cli-ghpages
 
       - name: Deploy
-        run: |
-          ng deploy --base-href=/chipsmmo/
+        run: ng deploy --base-href=/chipsmmo/
