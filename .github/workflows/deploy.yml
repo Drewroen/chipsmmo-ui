@@ -49,4 +49,7 @@ jobs:
       - name: Deploy
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ng deploy --base-href=/chipsmmo/ --no-silent
+        run: |
+          git config user.email "drewroen@gmail.com"
+          git config user.name "Drew Roen (Github Actions)"
+          ng deploy --base-href=/chipsmmo/ --no-silent
