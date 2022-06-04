@@ -6,7 +6,7 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-
+    permissions: write-all
     strategy:
       matrix:
         node-version: [ 18.x ]
@@ -47,7 +47,6 @@ jobs:
         run: npm install -g angular-cli-ghpages
 
       - name: Deploy
-        permissions: write-all
         run: |
           git config user.email "drewroen@gmail.com"
           git config user.name "Drew Roen (Github Actions)"
