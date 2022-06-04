@@ -1,6 +1,5 @@
 import { Constants } from './constants';
-
-declare var PIXI: any;
+import * as PIXI from 'pixi.js'
 
 export class GraphicConstants {
   public static terrain: Map<number, any> = new Map([
@@ -112,8 +111,8 @@ export class GraphicConstants {
   ]);
 
   public static ownership: Map<number, any> = new Map([
-    [Constants.OWNER_GREEN, GraphicConstants.generateTileTexture(12, 15)],
-    [Constants.OWNER_RED, GraphicConstants.generateTileTexture(11, 15)],
+    [Constants.OWNER_GREEN, GraphicConstants.generateTileTexture(11, 15)],
+    [Constants.OWNER_RED, GraphicConstants.generateTileTexture(10, 15)],
   ]);
 
   public static inventory: Map<number, any> = new Map([
@@ -162,14 +161,14 @@ export class GraphicConstants {
 
   private static generateTileTexture(x: number, y: number)
   {
-    let base = new PIXI.Texture.from('./../assets/TILESET.png');
+    let base = PIXI.Texture.from('./../assets/TILESET.png');
     let texture = new PIXI.Texture(base.baseTexture, new PIXI.Rectangle(32 * x, 32 * y, 32, 32));
     return texture;
   }
 
   private static generateNumberTexture(x: number, y: number)
   {
-    let base = new PIXI.Texture.from('./../assets/TIME_DIGITS.png');
+    let base = PIXI.Texture.from('./../assets/TIME_DIGITS.png');
     let texture = new PIXI.Texture(base.baseTexture, new PIXI.Rectangle(13 * x, 21 * y, 13, 21));
     return texture;
   }

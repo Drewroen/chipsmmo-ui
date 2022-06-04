@@ -27,7 +27,6 @@
               "src/styles.css"
             ],
             "scripts": [
-              "node_modules/pixi.js/dist/pixi.min.js"
             ]
           },
           "configurations": {
@@ -105,6 +104,9 @@
               "**/node_modules/**"
             ]
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }

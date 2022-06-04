@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Constants } from 'src/constants/constants';
 import { GraphicConstants } from 'src/constants/graphicConstants';
-
-declare var PIXI: any;
+import * as PIXI from 'pixi.js'
 
 @Injectable()
 export class InformationGraphics {
@@ -35,7 +34,7 @@ export class InformationGraphics {
 
     this.leaderboard = new Array<any>();
     for (let i = 0; i < 6; i++) {
-      const playerScoreGraphic = new PIXI.Text('', { font: '14px Arial', fill: 0x000000, fontWeight: 'normal' });
+      const playerScoreGraphic = new PIXI.Text('', { fontFamily: 'Arial', fontSize: 14, fill: 0x000000, fontWeight: 'normal' });
       playerScoreGraphic.x = Constants.MAIN_PANEL_SIZE + 122;
       playerScoreGraphic.y = 139 + (i * 18);
       playerScoreGraphic.anchor.set(0.5);

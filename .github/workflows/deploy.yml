@@ -6,10 +6,10 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-
+    permissions: write-all
     strategy:
       matrix:
-        node-version: 12.x
+        node-version: [ 18.x ]
 
     steps:
       - uses: actions/checkout@v2
@@ -35,17 +35,21 @@ jobs:
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: |
-          npm ci
+        run: npm ci
+
+      - name: Install angular cli
+        run: npm install -g @angular/cli
 
       - name: Build
-        run: |
-          ng build --prod --configuration production
+        run: ng build --prod --configuration production
 
       - name: Install angular-cli-ghpages
-        run: |
-          npm install -g angular-cli-ghpages
+        run: npm install -g angular-cli-ghpages
 
       - name: Deploy
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ng deploy --base-href=/chipsmmo/
+          git config user.email "drewroen@gmail.com"
+          git config user.name "Drew Roen (Github Actions)"
+          ng deploy --base-href=https://chipsmmo.cc --cname=chipsmmo.cc
