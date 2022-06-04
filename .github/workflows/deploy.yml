@@ -47,7 +47,6 @@ jobs:
         run: npm install -g angular-cli-ghpages
 
       - name: Deploy
-        run: |
-          git config user.email "drewroen@gmail.com"
-          git config user.name "Drew Roen (Github Actions)"
-          ng deploy --base-href=/chipsmmo/ --no-silent
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ng deploy --base-href=/chipsmmo/ --no-silent
