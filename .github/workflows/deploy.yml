@@ -52,4 +52,4 @@ jobs:
         run: |
           git config user.email "drewroen@gmail.com"
           git config user.name "Drew Roen (Github Actions)"
-          ng deploy --base-href=/chipsmmo-ui/ --no-silent
+          ng deploy --base-href=https://chipsmmo.cc --cname=chipsmmo.cc
