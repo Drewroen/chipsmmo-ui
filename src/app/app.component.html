@@ -1,8 +1,8 @@
 <div id="game-area">
   <div id="map">
-    <div id="main-panel" class="centered-panel white-panel medium-panel" *ngIf="appStates.centerPanelShouldShow()">
-      <div id="main-menu" *ngIf="appStates.menuState === MenuStates.Menu">
-        <div class="menu-settings-button" (click)="appStates.goToSettings()">
+    <div id="main-panel" class="centered-panel white-panel medium-panel" *ngIf="appStateService.centerPanelShouldShow()">
+      <div id="main-menu" *ngIf="appStateService.menuState === MenuStates.Menu">
+        <div class="menu-settings-button" (click)="appStateService.goToSettings()">
           <mat-icon>settings</mat-icon>
         </div>
         <div class="default-font menu-title">ChipsMMO</div>
@@ -12,22 +12,22 @@
             <input placeholder="Pick a name" [value]="userInfo.getUserName()" disabled class="name-input">
           </div>
         </div>
-        <button (click)="appStates.playGame()" class="menu-button button-full">Play</button>
-        <button (click)="appStates.goToLogin()" *ngIf="appStates.loginState !== LoginStates.LoggedIn" class="menu-button button-half">Log In</button>
-        <button (click)="loginService.logout()" *ngIf="appStates.loginState == LoginStates.LoggedIn" class="menu-button button-half">Log Out</button>
-        <button (click)="appStates.goToLobbies()" class="menu-button button-half">Lobbies</button>
+        <button (click)="appStateService.playGame()" class="menu-button button-full">Play</button>
+        <button (click)="appStateService.goToLogin()" *ngIf="appStateService.loginState !== LoginStates.LoggedIn" class="menu-button button-half">Log In</button>
+        <button (click)="loginService.logout()" *ngIf="appStateService.loginState == LoginStates.LoggedIn" class="menu-button button-half">Log Out</button>
+        <button (click)="appStateService.goToLobbies()" class="menu-button button-half">Lobbies</button>
       </div>
-      <div id="login-menu" *ngIf="appStates.menuState === MenuStates.Login">
+      <div id="login-menu" *ngIf="appStateService.menuState === MenuStates.Login">
         <form [formGroup]="forms.loginForm" (ngSubmit)="loginService.logIntoAccount()">
           <input formControlName="username" type="text" placeholder="Username" class="login-input">
           <input formControlName="password" type="password" placeholder="Password" class="login-input">
           <button type="submit" [disabled]="!forms.loginForm.valid" class="menu-button button-half">Login</button>
-          <button (click)="appStates.goToMenu()" class="menu-button button-half">Cancel</button>
-          <div class="default-font default-margin text-sm"><a (click)="appStates.goToCreateAccount()">Create an account</a> to pick your own username.</div>
-          <div class="error-font default-margin text-sm" *ngIf="appStates.loginState == LoginStates.Failed">Failed to login.</div>
+          <button (click)="appStateService.goToMenu()" class="menu-button button-half">Cancel</button>
+          <div class="default-font default-margin text-sm"><a (click)="appStateService.goToCreateAccount()">Create an account</a> to pick your own username.</div>
+          <div class="error-font default-margin text-sm" *ngIf="appStateService.loginState == LoginStates.Failed">Failed to login.</div>
         </form>
       </div>
-      <div id="lobbies-input" *ngIf="appStates.menuState === MenuStates.Lobbies">
+      <div id="lobbies-input" *ngIf="appStateService.menuState === MenuStates.Lobbies">
         <div *ngFor="let room of gameInformation.rooms">
           <button (click)="socketService.joinRoom(room.name)" class="lobbies-button" [disabled]="room.playerCount >= room.maxPlayerCount" [ngClass]="{'current-room-text': gameInformation.currentRoom.name === room.name}">
             <div class="lobbies-button-left-side">
@@ -45,33 +45,33 @@
             </div>
           </button>
         </div>
-        <button (click)="appStates.goToMenu()" class="lobbies-button">
+        <button (click)="appStateService.goToMenu()" class="lobbies-button">
           <div class="lobbies-button-back">
             Back
           </div>
         </button>
       </div>
-      <div class="create-account-menu" *ngIf="appStates.menuState === MenuStates.CreateAccount">
+      <div class="create-account-menu" *ngIf="appStateService.menuState === MenuStates.CreateAccount">
         <form [formGroup]="forms.createAccountForm" (ngSubmit)="loginService.createAccount()">
           <input formControlName="username" type="text" placeholder="Username" class="login-input">
           <input formControlName="password" type="password" placeholder="Password" class="login-input">
           <input formControlName="confirmPassword" type="password" placeholder="Confirm Password" class="login-input">
           <input formControlName="email" type="text" placeholder="Email (Optional)" class="login-input">
           <button type="submit" [disabled]="!forms.createAccountForm.valid" class="menu-button button-half">Create</button>
-          <button (click)="appStates.goToMenu()" class="menu-button button-half">Cancel</button>
-          <div class="error-font" *ngIf="appStates.loginState == LoginStates.Failed">Failed to create account. Username may already exist.</div>
+          <button (click)="appStateService.goToMenu()" class="menu-button button-half">Cancel</button>
+          <div class="error-font" *ngIf="appStateService.loginState == LoginStates.Failed">Failed to create account. Username may already exist.</div>
         </form>
       </div>
-      <div class="default-font default-margin text-md" *ngIf="appStates.menuState === MenuStates.Playing && appStates.gameState === GameStates.Starting">
+      <div class="default-font default-margin text-md" *ngIf="appStateService.menuState === MenuStates.Playing && appStateService.gameState === GameStates.Starting">
         Starting in {{ gameInformation.time }} seconds...
       </div>
-      <div class="default-font default-margin text-md" *ngIf="appStates.menuState === MenuStates.Loading">
+      <div class="default-font default-margin text-md" *ngIf="appStateService.menuState === MenuStates.Loading">
         Loading...
       </div>
-      <div class="default-font default-margin text-md" *ngIf="appStates.menuState === MenuStates.Respawning && appStates.gameState === GameStates.Playing">
+      <div class="default-font default-margin text-md" *ngIf="appStateService.menuState === MenuStates.Respawning && appStateService.gameState === GameStates.Playing">
         Respawning soon...
       </div>
-      <div id="settings-menu" *ngIf="appStates.menuState === MenuStates.Settings">
+      <div id="settings-menu" *ngIf="appStateService.menuState === MenuStates.Settings">
         <div class="settings-header-1">
           Settings
         </div>
@@ -126,13 +126,13 @@
             {{ userSettings.controls.callWhistle }}
           </button>
         </div>
-        <button (click)="appStates.goToMenu()" class="menu-button button-half">Back</button>
+        <button (click)="appStateService.goToMenu()" class="menu-button button-half">Back</button>
         <button (click)="userSettings.resetDefaultControls()" class="menu-button button-half">Reset</button>
       </div>
     </div>
-    <div id="footer-panel" class="centered-footer-panel white-panel wide-panel" *ngIf="appStates.centerFooterPanelShouldShow()">
+    <div id="footer-panel" class="centered-footer-panel white-panel wide-panel" *ngIf="appStateService.centerFooterPanelShouldShow()">
       <div class="error-font default-margin text-sm"><strong>NOTE: This site is in early development! Do not expect account info to stick around!</strong></div>
-      <div class="error-font default-margin text-sm">The good news? <a (click)="appStates.goToCreateAccount()">Creating an account</a> takes about 5 seconds.</div>
+      <div class="error-font default-margin text-sm">The good news? <a (click)="appStateService.goToCreateAccount()">Creating an account</a> takes about 5 seconds.</div>
     </div>
   </div>
 </div>

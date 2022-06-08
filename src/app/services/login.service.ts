@@ -1,10 +1,8 @@
-import { environment } from '../../environments/environment';
 import { UserInfo } from "../../objects/userInfo";
 import { Token } from "../../objects/token";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { AuthService } from './auth.service';
-import { AppStates } from 'src/objects/appStates';
+import { AppStateService } from 'src/objects/AppStateService';
 import { LoginState, MenuState } from 'src/constants/states';
 import { SocketIOService } from './socketio.service';
 import { Constants } from 'src/constants/constants';
@@ -12,29 +10,29 @@ import { Forms } from 'src/objects/forms';
 
 @Injectable()
 export class LoginService {
-  constructor(private authService: AuthService, private appStates: AppStates, private userInfo: UserInfo, private socketService: SocketIOService, private forms: Forms)
+  constructor(private authService: AuthService, private appStateService: AppStateService, private userInfo: UserInfo, private socketService: SocketIOService, private forms: Forms)
   {
     this.userInfo = userInfo;
   }
 
   public async loginWithExistingToken()
   {
-    this.appStates.menuState = MenuState.Loading;
+    this.appStateService.menuState = MenuState.Loading;
     if (localStorage.getItem('refresh_token') !== null) {
 
       try {
         var newAccessToken: Token = await this.authService.getNewAccessToken();
         localStorage.setItem("access_token", newAccessToken.accessToken);
-        this.appStates.loginState = LoginState.LoggedIn;
+        this.appStateService.loginState = LoginState.LoggedIn;
         this.userInfo.setUserInfo(await this.authService.getInfo());
         this.socketService.sendData(Constants.SOCKET_EVENT_LOGIN, newAccessToken.accessToken);
-        this.appStates.menuState = MenuState.Menu;
+        this.appStateService.menuState = MenuState.Menu;
       } catch {
         this.socketService.sendData(Constants.SOCKET_EVENT_LOGOUT, localStorage.getItem("access_token"));
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-        this.appStates.loginState = LoginState.LoggedOut;
-        this.appStates.menuState = MenuState.Menu;
+        this.appStateService.loginState = LoginState.LoggedOut;
+        this.appStateService.menuState = MenuState.Menu;
         this.userInfo.resetUserInfo();
       }
     }
@@ -42,28 +40,28 @@ export class LoginService {
       this.socketService.sendData(Constants.SOCKET_EVENT_LOGOUT, localStorage.getItem("access_token"));
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      this.appStates.loginState = LoginState.LoggedOut;
-      this.appStates.menuState = MenuState.Menu;
+      this.appStateService.loginState = LoginState.LoggedOut;
+      this.appStateService.menuState = MenuState.Menu;
       this.userInfo.resetUserInfo();
     }
   }
 
   public async logout() {
-    this.appStates.menuState = MenuState.Loading;
+    this.appStateService.menuState = MenuState.Loading;
     try {
       await this.authService.logout();
       this.socketService.sendData(Constants.SOCKET_EVENT_LOGOUT, localStorage.getItem("access_token"));
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      this.appStates.loginState = LoginState.LoggedOut;
-      this.appStates.menuState = MenuState.Menu;
+      this.appStateService.loginState = LoginState.LoggedOut;
+      this.appStateService.menuState = MenuState.Menu;
       this.userInfo.resetUserInfo();
     } catch {
       this.socketService.sendData(Constants.SOCKET_EVENT_LOGOUT, localStorage.getItem("access_token"));
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      this.appStates.loginState = LoginState.LoggedOut;
-      this.appStates.menuState = MenuState.Menu;
+      this.appStateService.loginState = LoginState.LoggedOut;
+      this.appStateService.menuState = MenuState.Menu;
       this.userInfo.resetUserInfo();
     };
   }
@@ -73,20 +71,20 @@ export class LoginService {
       let username = this.forms.loginForm.controls['username'].value;
       let password = this.forms.loginForm.controls['password'].value;
 
-      this.appStates.menuState = MenuState.Loading;
+      this.appStateService.menuState = MenuState.Loading;
       try {
         let token: Token = await this.authService.login(username, password);
         localStorage.setItem("access_token", token.accessToken);
         localStorage.setItem("refresh_token", token.refreshToken);
-        this.appStates.loginState = LoginState.LoggedIn;
+        this.appStateService.loginState = LoginState.LoggedIn;
         try {
           this.userInfo.setUserInfo(await this.authService.getInfo());
         } catch {}
         this.socketService.sendData(Constants.SOCKET_EVENT_LOGIN, localStorage.getItem("access_token"));
-        this.appStates.menuState = MenuState.Menu;
+        this.appStateService.menuState = MenuState.Menu;
       } catch {
-        this.appStates.loginState = LoginState.Failed;
-        this.appStates.menuState = MenuState.Login;
+        this.appStateService.loginState = LoginState.Failed;
+        this.appStateService.menuState = MenuState.Login;
         this.userInfo.resetUserInfo();
       };
     }
@@ -99,15 +97,15 @@ export class LoginService {
       let password = this.forms.createAccountForm.controls['password'].value;
       let email = this.forms.createAccountForm.controls['email'].value;
 
-      this.appStates.menuState = MenuState.Loading;
+      this.appStateService.menuState = MenuState.Loading;
       try {
         await this.authService.createAccount(username, password, email);
         this.forms.loginForm.controls['username'].setValue(username);
         this.forms.loginForm.controls['password'].setValue(password);
         this.logIntoAccount();
       } catch {
-        this.appStates.loginState = LoginState.Failed;
-        this.appStates.menuState = MenuState.CreateAccount;
+        this.appStateService.loginState = LoginState.Failed;
+        this.appStateService.menuState = MenuState.CreateAccount;
         this.userInfo.resetUserInfo();
       }
     }

@@ -4,12 +4,10 @@ import { LoginService } from 'src/app/services/login.service';
 import { SocketIOService } from 'src/app/services/socketio.service';
 import { Constants } from 'src/constants/constants';
 import { GameState } from 'src/constants/states';
-import { AppStates } from './appStates';
+import { AppStateService } from './AppStateService';
 import { EloResult } from './eloResult';
 import { GameInformation } from './gameInformation';
-import { Graphics } from './graphics/graphics';
 import { Player } from './player';
-import * as PIXI from 'pixi.js'
 
 @Injectable()
 export class AppSubscriptions {
@@ -19,7 +17,7 @@ export class AppSubscriptions {
   public multiLoginSub: Subscription;
   public eloSub: Subscription;
 
-  constructor(private socketService: SocketIOService, private gameInformation: GameInformation, private appStates: AppStates, private loginService: LoginService)
+  constructor(private socketService: SocketIOService, private gameInformation: GameInformation, private AppStateService: AppStateService, private loginService: LoginService)
   {
     this.gameMapSub = this.socketService.getData(Constants.SOCKET_EVENT_UPDATE_GAME_MAP_FULL)
     .subscribe((dataString: any) => {
@@ -43,15 +41,15 @@ export class AppSubscriptions {
         this.gameInformation.updatePlayerInfo();
         this.gameInformation.updateScoreboard();
 
-        var previousGameState = this.appStates.gameState
+        var previousGameState = this.AppStateService.gameState
         this.gameInformation.updateGameInfo();
-        if (this.appStates.gameState == GameState.Finished)
+        if (this.AppStateService.gameState == GameState.Finished)
           this.gameInformation.updateEndGameInfo();
         else
         {
           this.gameInformation.resetEndGameInfo();
           if (previousGameState === GameState.Finished)
-            this.appStates.goToMenu();
+            this.AppStateService.goToMenu();
         }
       }
     });

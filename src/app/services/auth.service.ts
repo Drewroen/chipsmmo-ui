@@ -14,7 +14,7 @@ export class AuthService {
 
   async getNewAccessToken() {
     return await this.http.post<Token>(environment.apiUrl + "/Account/token", {
-      refreshToken: localStorage.getItem("refresh_token"),
+      token: localStorage.getItem("refresh_token"),
     }).toPromise();
   }
 
