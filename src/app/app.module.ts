@@ -30,6 +30,7 @@ import { PixiApp } from 'src/objects/pixiApp';
 import { GameInformation } from 'src/objects/gameInformation';
 import { MapInformation } from 'src/objects/mapInformation';
 import { AppSubscriptions } from 'src/objects/appSubscriptions';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { AppSubscriptions } from 'src/objects/appSubscriptions';
     HttpClientModule,
     MatIconModule,
     BrowserAnimationsModule,
-    MatTooltipModule
+    MatTooltipModule,
+    CommonModule
   ],
   providers: [
     SocketIOService,
