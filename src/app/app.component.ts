@@ -6,7 +6,7 @@ import { Graphics } from 'src/objects/graphics/graphics';
 import { GameInformation } from 'src/objects/gameInformation';
 import { GameState, LoginState, MenuState } from 'src/constants/states';
 import { UserSettings } from 'src/objects/userSettings';
-import { AppStateService } from 'src/objects/AppStateService';
+import { AppStateService } from 'src/objects/appStateService';
 import { LoginService } from './services/login.service';
 import { KeyEventService } from './services/keyEvent.service';
 import { PixiApp } from 'src/objects/pixiApp';

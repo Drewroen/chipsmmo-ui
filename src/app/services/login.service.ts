@@ -2,7 +2,7 @@ import { UserInfo } from "../../objects/userInfo";
 import { Token } from "../../objects/token";
 import { Injectable } from "@angular/core";
 import { AuthService } from './auth.service';
-import { AppStateService } from 'src/objects/AppStateService';
+import { AppStateService } from 'src/objects/appStateService';
 import { LoginState, MenuState } from 'src/constants/states';
 import { SocketIOService } from './socketio.service';
 import { Constants } from 'src/constants/constants';

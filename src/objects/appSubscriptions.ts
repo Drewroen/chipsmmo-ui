@@ -4,7 +4,7 @@ import { LoginService } from 'src/app/services/login.service';
 import { SocketIOService } from 'src/app/services/socketio.service';
 import { Constants } from 'src/constants/constants';
 import { GameState } from 'src/constants/states';
-import { AppStateService } from './AppStateService';
+import { AppStateService } from './appStateService';
 import { EloResult } from './eloResult';
 import { GameInformation } from './gameInformation';
 import { Player } from './player';

@@ -14,7 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { UserControls } from 'src/objects/userControls';
 import { UserSettings } from 'src/objects/userSettings';
 import { UserInfo } from 'src/objects/userInfo';
-import { AppStateService } from 'src/objects/AppStateService';
+import { AppStateService } from 'src/objects/appStateService';
 import { Graphics } from 'src/objects/graphics/graphics';
 import { MapGraphics } from 'src/objects/graphics/mapGraphics';
 import { InformationGraphics } from 'src/objects/graphics/informationGraphics';

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { AppStateService } from 'src/objects/AppStateService';
+import { AppStateService } from 'src/objects/appStateService';
 import { MenuState } from 'src/constants/states';
 import { Constants } from 'src/constants/constants';
 import { MovementService } from './movement.service';

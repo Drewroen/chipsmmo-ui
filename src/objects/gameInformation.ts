@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { SocketIOService } from 'src/app/services/socketio.service';
 import { Constants } from 'src/constants/constants';
 import { GameState, MenuState } from 'src/constants/states';
-import { AppStateService } from './AppStateService';
+import { AppStateService } from './appStateService';
 import { EloResult } from './eloResult';
 import { Graphics } from './graphics/graphics';
 import { MapInformation } from './mapInformation';
