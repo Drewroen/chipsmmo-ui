@@ -5,7 +5,7 @@ import { GameState, LoginState, MenuState } from 'src/constants/states';
 import { UserInfo } from './userInfo';
 
 @Injectable()
-export class AppStates {
+export class AppStateService {
   menuState: MenuState;
   loginState: LoginState;
   gameState: GameState;
@@ -35,7 +35,7 @@ export class AppStates {
   }
 
   goToCreateAccount(): void {
-    if(this.loginState == LoginState.LoggedOut)
+    if(this.loginState != LoginState.LoggedIn)
       this.menuState = MenuState.CreateAccount;
   }
 

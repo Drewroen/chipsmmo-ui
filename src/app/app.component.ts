@@ -6,7 +6,7 @@ import { Graphics } from 'src/objects/graphics/graphics';
 import { GameInformation } from 'src/objects/gameInformation';
 import { GameState, LoginState, MenuState } from 'src/constants/states';
 import { UserSettings } from 'src/objects/userSettings';
-import { AppStates } from 'src/objects/appStates';
+import { AppStateService } from 'src/objects/AppStateService';
 import { LoginService } from './services/login.service';
 import { KeyEventService } from './services/keyEvent.service';
 import { PixiApp } from 'src/objects/pixiApp';
@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
     public loginService: LoginService,
     public userSettings: UserSettings,
     public userInfo: UserInfo,
-    public appStates: AppStates,
+    public appStateService: AppStateService,
     public graphics: Graphics,
     public forms: Forms,
     public gameInformation: GameInformation,

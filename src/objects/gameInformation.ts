@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { SocketIOService } from 'src/app/services/socketio.service';
 import { Constants } from 'src/constants/constants';
 import { GameState, MenuState } from 'src/constants/states';
-import { AppStates } from './appStates';
+import { AppStateService } from './AppStateService';
 import { EloResult } from './eloResult';
 import { Graphics } from './graphics/graphics';
 import { MapInformation } from './mapInformation';
@@ -18,7 +18,7 @@ export class GameInformation {
   public rooms: Room[] = GAME_ROOMS;
   public currentRoom: Room;
 
-  constructor(public map: MapInformation, private socketService: SocketIOService, private graphics: Graphics, private appStates: AppStates)
+  constructor(public map: MapInformation, private socketService: SocketIOService, private graphics: Graphics, private AppStateService: AppStateService)
   {
     this.players = [];
   }
@@ -99,12 +99,12 @@ export class GameInformation {
 
   updatePlayerInfo(): void {
     const currentPlayer = this.findPlayer();
-    if (currentPlayer && ![MenuState.CreateAccount, MenuState.Loading, MenuState.Lobbies, MenuState.Login, MenuState.Menu, MenuState.Settings].includes(this.appStates.menuState))
+    if (currentPlayer && ![MenuState.CreateAccount, MenuState.Loading, MenuState.Lobbies, MenuState.Login, MenuState.Menu, MenuState.Settings].includes(this.AppStateService.menuState))
     {
       if (currentPlayer.alive)
-        this.appStates.menuState = MenuState.Playing;
+        this.AppStateService.menuState = MenuState.Playing;
       else if (!currentPlayer.alive)
-        this.appStates.menuState = MenuState.Respawning;
+        this.AppStateService.menuState = MenuState.Respawning;
     }
 
 
@@ -129,13 +129,13 @@ export class GameInformation {
   updateGameInfo(): void {
     switch (this.status) {
       case (Constants.GAME_STATUS_PLAYING):
-        this.appStates.gameState = GameState.Playing;
+        this.AppStateService.gameState = GameState.Playing;
         break;
       case (Constants.GAME_STATUS_NOT_STARTED):
-        this.appStates.gameState = GameState.Starting;
+        this.AppStateService.gameState = GameState.Starting;
         break;
       case (Constants.GAME_STATUS_FINISHED):
-        this.appStates.gameState = GameState.Finished;
+        this.AppStateService.gameState = GameState.Finished;
         break;
     }
   }
