@@ -17,7 +17,7 @@ export class AppSubscriptions {
   public multiLoginSub: Subscription;
   public eloSub: Subscription;
 
-  constructor(private socketService: SocketIOService, private gameInformation: GameInformation, private AppStateService: AppStateService, private loginService: LoginService)
+  constructor(private socketService: SocketIOService, private gameInformation: GameInformation, private appStateService: AppStateService, private loginService: LoginService)
   {
     this.gameMapSub = this.socketService.getData(Constants.SOCKET_EVENT_UPDATE_GAME_MAP_FULL)
     .subscribe((dataString: any) => {
@@ -41,15 +41,15 @@ export class AppSubscriptions {
         this.gameInformation.updatePlayerInfo();
         this.gameInformation.updateScoreboard();
 
-        var previousGameState = this.AppStateService.gameState
+        var previousGameState = this.appStateService.gameState
         this.gameInformation.updateGameInfo();
-        if (this.AppStateService.gameState == GameState.Finished)
+        if (this.appStateService.gameState == GameState.Finished)
           this.gameInformation.updateEndGameInfo();
         else
         {
           this.gameInformation.resetEndGameInfo();
           if (previousGameState === GameState.Finished)
-            this.AppStateService.goToMenu();
+            this.appStateService.goToMenu();
         }
       }
     });

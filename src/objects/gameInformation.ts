@@ -18,7 +18,7 @@ export class GameInformation {
   public rooms: Room[] = GAME_ROOMS;
   public currentRoom: Room;
 
-  constructor(public map: MapInformation, private socketService: SocketIOService, private graphics: Graphics, private AppStateService: AppStateService)
+  constructor(public map: MapInformation, private socketService: SocketIOService, private graphics: Graphics, private appStateService: AppStateService)
   {
     this.players = [];
   }
@@ -99,12 +99,12 @@ export class GameInformation {
 
   updatePlayerInfo(): void {
     const currentPlayer = this.findPlayer();
-    if (currentPlayer && ![MenuState.CreateAccount, MenuState.Loading, MenuState.Lobbies, MenuState.Login, MenuState.Menu, MenuState.Settings].includes(this.AppStateService.menuState))
+    if (currentPlayer && ![MenuState.CreateAccount, MenuState.Loading, MenuState.Lobbies, MenuState.Login, MenuState.Menu, MenuState.Settings].includes(this.appStateService.menuState))
     {
       if (currentPlayer.alive)
-        this.AppStateService.menuState = MenuState.Playing;
+        this.appStateService.menuState = MenuState.Playing;
       else if (!currentPlayer.alive)
-        this.AppStateService.menuState = MenuState.Respawning;
+        this.appStateService.menuState = MenuState.Respawning;
     }
 
 
@@ -129,13 +129,13 @@ export class GameInformation {
   updateGameInfo(): void {
     switch (this.status) {
       case (Constants.GAME_STATUS_PLAYING):
-        this.AppStateService.gameState = GameState.Playing;
+        this.appStateService.gameState = GameState.Playing;
         break;
       case (Constants.GAME_STATUS_NOT_STARTED):
-        this.AppStateService.gameState = GameState.Starting;
+        this.appStateService.gameState = GameState.Starting;
         break;
       case (Constants.GAME_STATUS_FINISHED):
-        this.AppStateService.gameState = GameState.Finished;
+        this.appStateService.gameState = GameState.Finished;
         break;
     }
   }
