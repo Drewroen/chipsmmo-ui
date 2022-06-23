@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  socketUrl: 'https://socket.chipsmmo.cc',
+  socketUrl: 'http://localhost:5000',
   apiUrl: 'https://api.chipsmmo.cc'
 };
