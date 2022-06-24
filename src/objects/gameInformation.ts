@@ -24,12 +24,14 @@ export class GameInformation {
   }
 
   updateMap(): void {
+    var width = this.map.terrain.length;
+    var height = this.map.terrain[0].length;
     const playerCoords = this.findPlayerCoordinates() ||
-      [Math.floor(Constants.MAP_SIZE / 2), Math.floor(Constants.MAP_SIZE / 2)];
+      [Math.floor(width / 2), Math.floor(height / 2)];
     for (let relativeX = 0; relativeX < Constants.MAP_VIEW_SIZE; relativeX++) {
       for (let relativeY = 0; relativeY < Constants.MAP_VIEW_SIZE; relativeY++) {
-        const x = (playerCoords[0] + relativeX - Math.floor((Constants.MAP_VIEW_SIZE / 2)) + Constants.MAP_SIZE) % Constants.MAP_SIZE;
-        const y = (playerCoords[1] + relativeY - Math.floor((Constants.MAP_VIEW_SIZE / 2)) + Constants.MAP_SIZE) % Constants.MAP_SIZE;
+        const x = (playerCoords[0] + relativeX - Math.floor(Constants.MAP_VIEW_SIZE / 2) + width) % width;
+        const y = (playerCoords[1] + relativeY - Math.floor(Constants.MAP_VIEW_SIZE / 2) + height) % height;
         if (this.map.mobs[x][y] && this.map.mobs[x][y] !== 0) {
           let mobTileValue = this.map.mobs[x][y]?.value;
           if ([Constants.MOB_PLAYER_UP, Constants.MOB_PLAYER_DOWN, Constants.MOB_PLAYER_LEFT, Constants.MOB_PLAYER_RIGHT].includes(mobTileValue)) {
@@ -201,8 +203,10 @@ export class GameInformation {
   }
 
   private findPlayerCoordinates(): number[] {
-    for (let x = 0; x < Constants.MAP_SIZE; x++) {
-      for (let y = 0; y < Constants.MAP_SIZE; y++) {
+    var width = this.map.terrain.length;
+    var height = this.map.terrain[0].length;
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
         const tile = this.map.mobs[x][y];
         if (tile && this.tileIsPlayer(tile) && tile.id === this.socketService.getSocketId()) {
           return [x, y];
